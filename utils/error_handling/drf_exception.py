@@ -10,7 +10,6 @@ def drf_exception_handler(exc, context):
 
     # Now add the HTTP status code to the response.
     if response is not None:
-        print(response.data)
         error = ErrorMessage(
             title=response.data['detail'],
             detail=response.data['detail'],

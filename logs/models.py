@@ -12,7 +12,7 @@ class ApiCallLog(models.Model):
     context = models.JSONField(null=True, blank=True)
     # Active session when user is performing the action
     # For login and signup, session_id is None. Instead,
-    # 'response' column will have 'session_started' key.
+    # 'context' column will have 'user' key.
     session = models.UUIDField(null=True, blank=True)
     app_token = models.UUIDField(null=True, blank=True)
     status = models.IntegerField()
