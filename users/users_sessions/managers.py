@@ -1,9 +1,9 @@
 import uuid
 from django.db import models
 from django.utils.timezone import now
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from datetime import timedelta
 from .utils import generate_session_key, hash_this, getClientIP, getUserAgent
-from security.encoding import b64encode, b64decode
 
 
 class SessionManager(models.Manager):
@@ -43,7 +43,7 @@ class SessionManager(models.Manager):
             ua=getUserAgent(request),
             expire_at=now() + timedelta(days=self.KEY_EXPIRE_IN_DAYS)
         )
-        return b64encode(key), session
+        return urlsafe_base64_encode(key.encode("ascii")), session
 
     def delete_session(self, user, session_id):
         """Primary use case: Logout a user
@@ -72,7 +72,7 @@ class SessionManager(models.Manager):
             Session or None
         """
         try:
-            key = b64decode(key)
+            key = urlsafe_base64_decode(key).decode("ascii")
             session = self.select_related('user').get(
                 key=hash_this(key),
                 ip=ip,
@@ -121,3 +121,9 @@ class SessionManager(models.Manager):
 
     def get_last_session(self, user):
         return self.filter(user=user).order_by('-created_at').first()
+
+    def get_user(self, session_id):
+        try:
+            return self.get(id=session_id).user
+        except Exception as e:
+            return None

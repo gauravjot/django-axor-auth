@@ -1,5 +1,5 @@
 from .models import AppToken
-from django.utils.encoding import force_str as _
+from django.utils.encoding import force_str
 from .utils import getUserAgent
 
 
@@ -29,8 +29,9 @@ class AppTokenMiddleware:
         apptoken = None
         # Check if auth token is present in header
         if apptoken is None and 'Authorization' in request.headers:
-            key = _(request.headers['Authorization'])
-            if key is None:
+            token = force_str(request.headers['Authorization'])
+            if token is None:
                 return None
-            return AppToken.objects.authenticate_app_token(key, getUserAgent(request))
+            token = token.split(' ')[-1]  # Get the token from 'Bearer <token>'
+            return AppToken.objects.authenticate_app_token(token, getUserAgent(request))
         return apptoken

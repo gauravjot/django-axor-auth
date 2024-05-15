@@ -1,4 +1,4 @@
-from django.utils.encoding import force_str as _
+from django.utils.encoding import force_str
 from rest_framework import serializers
 from .models import User
 from .api import get_user
@@ -50,10 +50,10 @@ class LoginSerializer(serializers.Serializer):
         if 'email' not in data or 'password' not in data:
             raise serializers.ValidationError(
                 'All fields are required.')
-        user = get_user(_(data['email']))
+        user = get_user(force_str(data['email']))
         if user:
             # Check if password is correct
-            if not user.check_password(_(data['password'])):
+            if not user.check_password(force_str(data['password'])):
                 raise serializers.ValidationError('Credentials are invalid.')
             # Check if user is active
             if not user.is_active:
@@ -71,4 +71,4 @@ class PasswordSerializer(serializers.Serializer):
         if 'password' not in data:
             raise serializers.ValidationError('Password is required.')
         # validate password
-        return validate_password(_(data['password']))
+        return validate_password(force_str(data['password']))

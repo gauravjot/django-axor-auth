@@ -37,11 +37,21 @@ def delete_app_token(user, app_token_id):
 
     Args:
         user: User
-        app_token_id: int
+        app_token_id: uuid
 
     Returns: None
     """
     AppToken.objects.delete_app_token(user, app_token_id)
+
+
+def get_user(app_token_id):
+    """
+    Get the user for the app_token
+
+    Args:
+        app_token_id: uuid
+    """
+    return AppToken.objects.get_user(app_token_id)
 
 
 def get_last_token_session_details(user):
@@ -63,7 +73,7 @@ def get_app_token_if_valid(user, app_token_id, serialized=False):
 
     Args:
         user: User
-        app_token_id: int
+        app_token_id: uuid
     """
     app_token = AppToken.objects.get_app_token_if_valid(user, app_token_id)
     if app_token is not None and serialized:

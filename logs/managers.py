@@ -1,5 +1,4 @@
 import json
-import uuid
 from django.db import models
 from users.users_sessions.utils import get_active_session
 from users.users_app_tokens.utils import get_active_token
@@ -24,11 +23,26 @@ class LogManager(models.Manager):
         log = self.model(
             url=request.get_full_path(),
             status=status,
-            response=json.dumps(response),
-            session_id=uuid.UUID(
-                str(session.id)) if session is not None else None,
-            app_token_id=uuid.UUID(
-                str(app_token.id)) if app_token is not None else None,
-
+            context=json.dumps(response['m'] if hasattr(
+                response, 'm') else response),
+            session=session.id if session is not None else None,
+            app_token=app_token.id if app_token is not None else None,
+            ip=getClientIP(request),
+            ua=getUserAgent(request)
         )
         log.save()
+
+
+# Get Client IP Address
+def getClientIP(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+# Get User Agent
+def getUserAgent(request):
+    return request.META.get('HTTP_USER_AGENT')

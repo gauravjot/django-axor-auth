@@ -36,9 +36,9 @@ class APILogMiddleware:
         else:
             # check if content has key 'session_id', that means this
             # response is from login or signup API
-            if 'session_id' in content:
+            if 'user' in content:
                 log = LogResponse(status=response.status_code, message=dict(
-                    session_started=content['session_id']))
+                    user=content['user']['email']))
             else:
                 log = LogResponse(status=response.status_code)
         ApiCallLog.objects.create_log(

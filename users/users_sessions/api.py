@@ -44,6 +44,16 @@ def delete_session(user, session_id):
     Session.objects.delete_session(user, session_id)
 
 
+def get_user(session_id):
+    """
+    Get the user for the session
+
+    Args:
+        session_id: int
+    """
+    return Session.objects.get_user(session_id)
+
+
 def get_last_session_details(user):
     """
     Get the last session details for the user

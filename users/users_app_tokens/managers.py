@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.utils.timezone import now
 from .utils import generate_token, hash_this, getClientIP, getUserAgent
-from security.encoding import b64encode, b64decode
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 
 class AppTokenManager(models.Manager):
@@ -31,7 +31,7 @@ class AppTokenManager(models.Manager):
             ip=getClientIP(request),
             ua=getUserAgent(request),
         )
-        return b64encode(key), token
+        return urlsafe_base64_encode(key.encode("ascii")), token
 
     def delete_app_token(self, user, app_token_id):
         """Primary use case: Logout a user
@@ -60,7 +60,7 @@ class AppTokenManager(models.Manager):
             AppToken or None
         """
         try:
-            key = b64decode(token)
+            key = urlsafe_base64_decode(token).decode("ascii")
             app_token = self.select_related('user').get(
                 token=hash_this(key),
                 ua=ua,
@@ -94,3 +94,9 @@ class AppTokenManager(models.Manager):
 
     def get_last_session(self, user):
         return self.filter(user=user).order_by('-created_at').first()
+
+    def get_user(self, app_token_id):
+        try:
+            return self.get(id=app_token_id).user
+        except Exception as e:
+            return None

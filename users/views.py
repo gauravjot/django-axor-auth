@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.utils.encoding import force_str as _
+from django.utils.encoding import force_str
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from utils.error_handling.error_message import ErrorMessage
@@ -62,7 +62,7 @@ def login(request):
                     title='Invalid credentials',
                 ).to_response()
             # Authenticate TOTP
-            if not authenticate_totp(user, _(request.data['token']), totp_row):
+            if not authenticate_totp(user, force_str(request.data['token']), totp_row):
                 return ErrorMessage(
                     detail="TOTP is invalid.",
                     status=400,
@@ -132,7 +132,7 @@ def token_login(request):
                     title='Invalid credentials',
                 ).to_response()
             # Authenticate TOTP
-            if not authenticate_totp(user, _(request.data['token']), totp_row):
+            if not authenticate_totp(user, force_str(request.data['token']), totp_row):
                 return ErrorMessage(
                     detail="TOTP is invalid.",
                     status=400,

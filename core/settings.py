@@ -43,16 +43,16 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-
-    "users.users_sessions.middlewares.SessionMiddleware",
-    "users.users_app_tokens.middlewares.AppTokenMiddleware",
-
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
+    "core.middlewares.APIRequestFormatMiddleware",
+    "users.users_app_tokens.middlewares.AppTokenMiddleware",
+    "core.middlewares.RequestOriginMiddleware",
+    "users.users_sessions.middlewares.SessionMiddleware",
     "logs.middlewares.APILogMiddleware",
 ]
 
@@ -82,7 +82,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.error_handling.drf_exception.drf_exception_handler',
 }
 
-# CORS
+# Security
 
 CORS_ALLOWED_ORIGINS = [config('FRONTEND_URL')]
 CSRF_TRUSTED_ORIGINS = [config('FRONTEND_URL')]
@@ -106,6 +106,10 @@ CORS_ALLOW_HEADERS = (
     "x-csrftoken",
     "x-requested-with",
 )
+
+# Set the origins that API will respond to.
+# To set all origins, use value ['*']
+ALLOW_ORIGINS = [config('FRONTEND_URL')]
 
 
 # Database
@@ -133,7 +137,15 @@ def get_database():
 
 
 # If no database is provided, use sqlite3
-DATABASES = get_database()
+DATABASES = {
+    'logs_db': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': PROJECT_BASE_DIR / 'db' / 'logs.sqlite3',
+    },
+    **get_database()
+}
+
+DATABASE_ROUTERS = ["core.database_router.DatabaseRouter"]
 
 # Email
 # https://docs.djangoproject.com/en/5.0/topics/email/

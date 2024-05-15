@@ -1,14 +1,14 @@
-from django.utils.encoding import force_str as _
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from decouple import config
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from utils.error_handling.error_message import ErrorMessage
+from users.serializers import PasswordSerializer
+from users.users_utils.emailing.api import send_forgot_password_email, send_password_changed_email
 from .models import ForgotPassword
 from .serializers import HealthyForgotPasswordSerializer
-from utils.error_handling.error_message import ErrorMessage
 from .utils import KEY_LENGTH
-from users.serializers import PasswordSerializer
-from security.encoding import b64encode, b64decode
-from users.users_utils.emailing.api import send_forgot_password_email, send_password_changed_email
-from decouple import config
 
 
 @api_view(['POST'])
@@ -24,14 +24,14 @@ def forgot_password(request):
         return err.to_response()
     key, fp = ForgotPassword.objects.create_forgot_password(
         request,
-        _(request.data['email'])
+        force_str(request.data['email'])
     )
     if key and fp:
-        key = b64encode(key)
+        key = urlsafe_base64_encode(key.encode("ascii"))
         # Send email with key
-        url = f'{config("FRONTEND_URL")}/api_action/user/forgot_password/{b64encode(key)}/'
+        url = f'{config("FRONTEND_URL")}/api_action/user/forgot_password/{urlsafe_base64_encode(key.encode("ascii"))}/'
         send_forgot_password_email(
-            email=_(fp.user.email),
+            email=force_str(fp.user.email),
             reset_url=url,
             first_name=fp.user.first_name,
             subject='Reset your password'
@@ -42,8 +42,8 @@ def forgot_password(request):
 
 @api_view(['POST'])
 def check_health(request):
-    key = _(request.data['key'])
-    key = b64decode(key)
+    key = force_str(request.data['key'])
+    key = urlsafe_base64_decode(key).decode("ascii")
     serializer = HealthyForgotPasswordSerializer(data={'key': key})
     if not serializer.is_valid():
         err = ErrorMessage(
@@ -69,8 +69,8 @@ def reset_password(request):
         )
         return err.to_response()
     # Check if key is permissible
-    key = _(request.data['key'])
-    key = b64decode(key)
+    key = force_str(request.data['key'])
+    key = urlsafe_base64_decode(key).decode("ascii")
     if len(key) != KEY_LENGTH:
         err = ErrorMessage(
             title='Invalid Request',
@@ -94,7 +94,7 @@ def reset_password(request):
     serializer = PasswordSerializer(data=request.data)
     if serializer.is_valid():
         # Set new password
-        fp.user.set_password(_(request.data['password']))
+        fp.user.set_password(force_str(request.data['password']))
         fp.user.save()
         # Set fp as used
         fp.set_used()

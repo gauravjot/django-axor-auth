@@ -28,7 +28,8 @@ def has_totp(user):
     Returns: TOTP or None
     """
     try:
-        totp = Totp.objects.get(Q(user=user), ~Q(status='disabled'))
+        totp = Totp.objects.get(Q(user=user), ~Q(
+            status='disabled'), ~Q(status='initialized'))
         return totp
     except Totp.DoesNotExist:
         return None
