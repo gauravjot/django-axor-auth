@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 """
-/api/forgot_password/
+/api/user/forgot_password/
 """
 urlpatterns = [
     path('request/', views.forgot_password),

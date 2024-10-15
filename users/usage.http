@@ -1,0 +1,86 @@
+@host = localhost:8001
+
+// Not providing this header or using 'web' performs cookie based authentication.
+// Using anything else performs token based authentication.
+@x_requested_by = mobile
+
+@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJlV1IxUzFkVE5ERkNRMEZ2V0RaV1ExRlpjVTV0WDNOdlFWaFdjazVIYm5kcVJqWlRaMEUxYkhkdFJGOUhaaTA0VFRkVU56ZHFWRTF2Um1Gc1VVMUlRbFpEZFVGRVQwaExWM3BaTXpGRVNuZ3pURGhsVjFFIn0.BFS4iCaZpZ5KQyaoGMzCWFmvElLBljFEIN-U9A7_8e0
+
+### Register a new user
+POST http://{{host}}/api/user/register/
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john@test.com",
+  "password": "Pass1234!"
+}
+
+### Login a user - Cookie based
+POST http://{{host}}/api/user/login/
+Content-Type: application/json
+
+{
+  "email": "john@test.com",
+  "password": "Pass1234!"
+}
+
+### Login a user - Token based
+POST http://{{host}}/api/user/login/
+Content-Type: application/json
+X-Requested-By: {{x_requested_by}}
+
+{
+  "email": "john@test.com",
+  "password": "Pass1234!",
+  "code": 555923
+}
+
+### Get user profile
+GET http://{{host}}/api/user/me/
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+### Logout a user
+POST http://{{host}}/api/user/logout/
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+
+### TOTP
+
+### Initialize TOTP
+POST http://{{host}}/api/user/totp/init/
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+### Enable TOTP
+POST http://{{host}}/api/user/totp/enable/
+Content-Type: application/json
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+{
+  "code": 789644
+}
+
+### Disable TOTP
+PUT http://{{host}}/api/user/totp/disable/
+Content-Type: application/json
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+{
+  "code": 571560
+}
+
+### Reset backup codes
+POST http://{{host}}/api/user/totp/new-backup-codes/
+Content-Type: application/json
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+{
+  "code": 899245
+}

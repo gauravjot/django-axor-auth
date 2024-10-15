@@ -1,11 +1,8 @@
-import os
 import string
 import random
-from core.settings import PROJECT_BASE_DIR
-
-
-KEY_PATH = os.path.join(PROJECT_BASE_DIR, 'keys',
-                        'users_totp_key.bin')
+import hashlib
+from secrets import token_urlsafe
+from core.settings import TOTP_NUM_OF_BACKUP_CODES, TOTP_BACKUP_CODE_LENGTH
 
 
 def generate_backup_codes():
@@ -15,8 +12,35 @@ def generate_backup_codes():
         list: A list of backup codes
     """
     backup_codes = []
-    for _ in range(6):
+    for _ in range(TOTP_NUM_OF_BACKUP_CODES):
         backup_code = ''.join(random.choices(
-            string.ascii_lowercase + string.digits, k=8))
+            string.ascii_lowercase + string.digits, k=TOTP_BACKUP_CODE_LENGTH))
         backup_codes.append(backup_code)
     return backup_codes
+
+
+def generate_token():
+    # This token length can be of any size as sha256 is used
+    # and saved in database as fixed 64 characters. At least
+    # 64 characters key is recommended.
+    return token_urlsafe(64)
+
+
+# Hash Function for key
+def hash_this(string):
+    return hashlib.sha256(str(string).encode('utf-8')).hexdigest()
+
+
+# Get Client IP Address
+def getClientIP(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+# Get User Agent
+def getUserAgent(request):
+    return request.META.get('HTTP_USER_AGENT')

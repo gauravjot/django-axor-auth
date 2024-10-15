@@ -2,10 +2,6 @@ from pathlib import Path
 from decouple import config
 from django.core.mail import get_connection
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_BASE_DIR = BASE_DIR
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config(
     'SECRET_KEY', default='django-insecure$&!9x6t7m7q2^q1l7c@z5@2!&1!v1c7zq^r#_b2z9#q^w3q9z')
@@ -15,9 +11,30 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
-# Custom Settings
+# ----- Custom App Settings
+#
+# These settings are used in the project to customize the behavior of the app.
+# ---------------------------------------------------------------------------
 
+# General
+APP_NAME = 'Django Boilerplate'
+# User app
 FORGET_PASSWORD_LINK_TIMEOUT = 30  # minutes
+FORGET_PASSWORD_LOCKOUT_TIME = 24  # hours (To prevent bad actors)
+TOTP_NUM_OF_BACKUP_CODES = 8
+TOTP_BACKUP_CODE_LENGTH = 8  # keep it more than 6 to differentiate from TOTP code
+
+
+# ----- Django Settings
+#
+# These settings are used by Django to configure the project. Do not change
+# these settings unless you know what you are doing.
+# Configuration of these settings is done in the .env file.
+# ---------------------------------------------------------------------------
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_BASE_DIR = BASE_DIR
 
 # Application definition
 
@@ -43,17 +60,23 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
+    # Apply on request
     "core.middlewares.APIRequestFormatMiddleware",
+    "core.middlewares.HeaderRequestedByMiddleware",
     "users.users_app_tokens.middlewares.AppTokenMiddleware",
     "core.middlewares.RequestOriginMiddleware",
     "users.users_sessions.middlewares.SessionMiddleware",
+
+    # Apply on response
     "logs.middlewares.APILogMiddleware",
+    "core.middlewares.FormulateResponseMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'

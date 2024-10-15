@@ -52,3 +52,15 @@ def authenticate_totp(user, token, totp_row=None):
         if totp_row is None:
             return False
     return True if Totp.objects.authenticate(user, token, totp_row) else False
+
+
+def disable_totp(user):
+    """
+    Disable the TOTP for the user
+
+    Args:
+        user (User): Model object
+
+    Returns: bool
+    """
+    return Totp.objects.disable_totp(user)

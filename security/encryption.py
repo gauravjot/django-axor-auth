@@ -1,13 +1,10 @@
 import json
 from Crypto.Cipher import AES
+from core.settings import SECRET_KEY
 
 
-def encrypt(key_path, obj):
-    # Get the key
-    with open(key_path, 'rb') as f:
-        key = f.read()
-
-    cipher = AES.new(key, AES.MODE_EAX)
+def encrypt(obj):
+    cipher = AES.new(key_as_bytes(), AES.MODE_EAX)
 
     # Encrypt
     ciphertext, tag = cipher.encrypt_and_digest(str.encode(json.dumps(obj)))
@@ -15,14 +12,19 @@ def encrypt(key_path, obj):
     return b''.join(encrypted)
 
 
-def decrypt(key_path, obj):
-    # Get the key
-    with open(key_path, 'rb') as f:
-        key = f.read()
+def decrypt(obj):
     nonce, tag, ciphertext = obj[:16], obj[16:32], obj[32:]
     try:
-        cipher = AES.new(key, AES.MODE_EAX, nonce)
+        cipher = AES.new(key_as_bytes(), AES.MODE_EAX, nonce)
         data = cipher.decrypt_and_verify(ciphertext, tag)
         return json.loads(data)
     except ValueError:
         return None
+
+
+def key_as_bytes():
+    bytes = SECRET_KEY.encode('utf-8')[0:32]
+    # If the key is less than 32 bytes, pad it
+    while len(bytes) < 32:
+        bytes += bytes
+    return bytes[0:32]

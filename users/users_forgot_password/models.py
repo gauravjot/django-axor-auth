@@ -1,4 +1,3 @@
-import bcrypt
 from datetime import timedelta
 from django.db import models
 from django.utils.timezone import now
@@ -28,7 +27,7 @@ class ForgotPassword(models.Model):
         self.save()
 
     def check_key(self, key):
-        return bcrypt.checkpw(key.encode('utf-8'), self.key.encode('utf-8'))
+        return hash_this(key) == self.key
 
     def check_valid(self):
         # Check if used

@@ -17,15 +17,10 @@ resetdb:
 	.venv/bin/python manage.py migrate
 	.venv/bin/python manage.py migrate --database=logs_db
 
-resetkeys:
-	tar -czf ./keys/backup_$(shell date +%Y%m%d-%H%M.%S).tar.gz ./keys/*
-	rm -f ./keys/*.bin
-	.venv/bin/python manage.py generate_users_totp_key
-
 superuser:
 	.venv/bin/python manage.py createsuperuser
 
-getready: venv resetdb resetkeys
+getready: venv resetdb
 
 run:
 	.venv/bin/python manage.py runserver 0.0.0.0:8001

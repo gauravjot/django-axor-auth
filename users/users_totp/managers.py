@@ -2,7 +2,7 @@ import pyotp
 from datetime import timedelta
 from django.db import models
 from django.utils.timezone import now
-from .utils import generate_backup_codes, KEY_PATH
+from .utils import generate_backup_codes
 from security.encryption import encrypt, decrypt
 from django.db.models import Q
 
@@ -32,8 +32,8 @@ class TotpManager(models.Manager):
         backup_codes = generate_backup_codes()
         totp = self.create(
             user=user,
-            key=encrypt(KEY_PATH, key),
-            backup_codes=encrypt(KEY_PATH, backup_codes)
+            key=encrypt(key),
+            backup_codes=encrypt(backup_codes)
         )
         return key, backup_codes, totp
 
@@ -67,7 +67,7 @@ class TotpManager(models.Manager):
                 if totp_row is None:
                     return None
             # Get the key from the totp object
-            key = decrypt(KEY_PATH, totp_row.key)
+            key = decrypt(totp_row.key)
             # Verify the token using the key
             if pyotp.TOTP(key).verify(token):
                 # Clear out any backup code attempts
@@ -95,10 +95,10 @@ class TotpManager(models.Manager):
             # Only accept backup token if the status is enabled or backup_used
             if totp_row.status == 'enabled' or totp_row.status == 'backup_used':
                 # Check if the token is a backup code
-                backup_codes = decrypt(KEY_PATH, totp_row.backup_codes)
+                backup_codes = decrypt(totp_row.backup_codes)
                 if token in backup_codes:
                     backup_codes.remove(token)
-                    totp_row.backup_codes = encrypt(KEY_PATH, backup_codes)
+                    totp_row.backup_codes = encrypt(backup_codes)
                     totp_row.status = 'backup_used'
                     totp_row.bc_attempts = 0
                     totp_row.bc_timeout = None
@@ -138,7 +138,7 @@ class TotpManager(models.Manager):
             # Get the user's totp object
             totp_row = self.get(Q(user=user), ~Q(status='disabled'))
             # Update the backup codes
-            totp_row.backup_codes = encrypt(KEY_PATH, backup_codes)
+            totp_row.backup_codes = encrypt(backup_codes)
             totp_row.status = 'enabled'
             totp_row.updated_at = now()
             totp_row.save()

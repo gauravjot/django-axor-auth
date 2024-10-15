@@ -1,4 +1,3 @@
-from calendar import c
 from django.db import models
 from .utils import generateKey, getClientIP, getUserAgent, hash_this
 from users.api import get_user

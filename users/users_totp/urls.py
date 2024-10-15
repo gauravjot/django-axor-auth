@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 """
-api/totp/
+api/user/totp/
 """
 urlpatterns = [
     path('init/', views.totp_init),
