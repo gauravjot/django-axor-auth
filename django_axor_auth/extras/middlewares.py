@@ -2,18 +2,23 @@ import json
 from django.http import JsonResponse
 from django.conf import settings
 from ..utils.error_handling.error_message import ErrorMessage
+from ..configurator import config
 
 
-class APIRequestFormatMiddleware:
+class ValidateJsonMiddleware:
+    """Check if the request body data is valid JSON.
+
+    This only works for POST, PUT, and PATCH requests. If the request body
+    is not a valid JSON, the request is halted and an error message is
+    given as response.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
-
         # Run on API requests only
-        if request.path.startswith('/api') and request.content_type == 'application/json':
+        if request.path.startswith(config.URI_PREFIX) and request.content_type == 'application/json':
             if not self.validate_json_payload(request):
                 error = ErrorMessage(
                     detail='Invalid JSON payload.',
@@ -26,8 +31,6 @@ class APIRequestFormatMiddleware:
                     status=400)
 
         response = self.get_response(request)
-        # Code to be executed for each request/response after
-        # the view is called.
         return response
 
     def validate_json_payload(self, request):
@@ -40,16 +43,18 @@ class APIRequestFormatMiddleware:
         return True
 
 
-class RequestOriginMiddleware:
+class VerifyRequestOriginMiddleware:
+    """ Verifies if a request origin is allowed to make requests.
+
+    For an origin to make request, it has to be in settings.ALLOW_ORIGINS list.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
-
         # Run on API requests only
-        if request.path.startswith('/api'):
+        if request.path.startswith(config.URI_PREFIX):
             # If Token authentication is used that means
             # the API is accessed by a non-web application.
             # In that case, we don't need to check the origin.
@@ -67,8 +72,6 @@ class RequestOriginMiddleware:
                         status=400)
 
         response = self.get_response(request)
-        # Code to be executed for each request/response after
-        # the view is called.
         return response
 
     def validate_origin_header(self, request):
@@ -76,7 +79,7 @@ class RequestOriginMiddleware:
         if settings.DEBUG:
             return True
         # If ALLOW_ORIGINS is set to '*', allow all origins
-        if settings.ALLOW_ORIGINS[0] == '*':
+        if len(settings.ALLOW_ORIGINS) > 0 and settings.ALLOW_ORIGINS[0] == '*':
             return True
         # Check if the request origin is in ALLOW_ORIGINS
         if request.headers.get('Origin') in settings.ALLOW_ORIGINS:
@@ -89,11 +92,8 @@ class HeaderRequestedByMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
-
         # Run on API requests only
-        if request.path.startswith('/api'):
+        if request.path.startswith(config.URI_PREFIX):
             # If 'X-Requested-By' header is present and not set to 'web'
             # then token based authentication is used. In such case,
             # provide 'Authorization' header with token.
@@ -103,53 +103,8 @@ class HeaderRequestedByMiddleware:
                 request.requested_by = 'web'
 
         response = self.get_response(request)
-        # Code to be executed for each request/response after
-        # the view is called.
         return response
 
 
 def is_web(request):
     return request.requested_by == 'web'
-
-
-class FormulateResponseMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        # Code to be executed for each request before
-        # the view (and later middleware) are called.
-
-        response = self.get_response(request)
-        # Code to be executed for each request/response after
-        # the view is called.
-        if request.path.startswith('/api') and "Content-Type" in response.headers and response.headers["Content-Type"] in ['application/json', 'application/problem+json']:
-            response_format = dict(
-                success=None,
-                data=None,
-                errors=None,
-                status=response.status_code
-            )
-            if response.status_code > 399 and response.status_code < 500:
-                response_format['success'] = False
-                response_format['errors'] = json.loads(
-                    response.content.decode('utf8'))
-            elif response.status_code < 300:
-                response_format['success'] = True
-                if response.status_code != 204 and response.content:
-                    response_format['data'] = json.loads(
-                        response.content.decode('utf8'))
-                if response.status_code == 204:
-                    response.status_code = 200
-                    response_format['status'] = 200
-            response.content = json.dumps(response_format)
-        elif request.path.startswith('/api') and "Content-Type" not in response.headers:
-            response_format = dict(
-                success=response.status_code < 300,
-                data=None,
-                errors=None,
-                status=200
-            )
-            response.content = json.dumps(response_format)
-            response.status_code = 200
-        return response

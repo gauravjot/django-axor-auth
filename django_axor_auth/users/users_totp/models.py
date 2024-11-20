@@ -22,6 +22,10 @@ class Totp(models.Model):
     bc_attempts = models.IntegerField(default=0)
     bc_timeout = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        db_table = 'axor_totp'
+        ordering = ['-created_at']
+
     objects = TotpManager()
 
     def __str__(self):

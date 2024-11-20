@@ -1,8 +1,8 @@
 import uuid
 from django.db import models
-from ..models import User
 from django.utils.timezone import now
 from django.db import models
+from ..models import User
 from .managers import SessionManager
 
 
@@ -16,6 +16,10 @@ class Session(models.Model):
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(default=now)
     expire_at = models.DateTimeField()
+
+    class Meta:
+        db_table = 'axor_sessions'
+        ordering = ['-created_at']
 
     objects = SessionManager()
 

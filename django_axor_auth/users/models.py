@@ -22,6 +22,7 @@ class User(models.Model):
         'self', on_delete=models.SET_NULL, related_name='user_updated_by', null=True, blank=True)
 
     class Meta:
+        db_table = 'axor_users'
         ordering = ['first_name', 'last_name']
 
     objects = UserManager()
@@ -52,5 +53,9 @@ class UserPasswordChange(models.Model):
     date = models.DateTimeField(default=None, null=True)
     method = models.CharField(
         max_length=32, choices=method_choices, default=None, null=True)
+
+    class Meta:
+        db_table = 'axor_user_password_change'
+        ordering = ['date']
 
     objects = UserPasswordChangeManager()

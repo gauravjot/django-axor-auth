@@ -15,6 +15,10 @@ class AppToken(models.Model):
     ua = models.TextField()
     created_at = models.DateTimeField(default=now)
 
+    class Meta:
+        db_table = 'axor_app_tokens'
+        ordering = ['-created_at']
+
     objects = AppTokenManager()
 
     def __str__(self):

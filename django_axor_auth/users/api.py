@@ -1,4 +1,4 @@
-from .models import User, UserPasswordChange
+from .models import User
 from ..extras.middlewares import is_web
 # Session Imports
 from .users_sessions.utils import get_active_session

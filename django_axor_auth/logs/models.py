@@ -20,6 +20,10 @@ class ApiCallLog(models.Model):
     ua = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(default=now)
 
+    class Meta:
+        db_table = 'axor_api_call_logs'
+        ordering = ['-created_at']
+
     objects = LogManager()
 
     def __str__(self):

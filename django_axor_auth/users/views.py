@@ -16,7 +16,7 @@ from .users_app_tokens.utils import get_active_token
 from .users_totp.api import has_totp, authenticate_totp
 # User Imports
 from .serializers import UserSerializer, LoginSerializer, RegistrationSerializer
-from .permissions import HasSessionOrTokenActive
+from .permissions import IsAuthenticated
 
 
 @api_view(['POST'])
@@ -142,7 +142,7 @@ def login(request):
 
 
 @api_view(['POST'])
-@permission_classes([HasSessionOrTokenActive])
+@permission_classes([IsAuthenticated])
 def logout(request):
     # Delete session or token
     if is_web(request):
@@ -162,7 +162,7 @@ def logout(request):
 
 
 @api_view(['GET'])
-@permission_classes([HasSessionOrTokenActive])
+@permission_classes([IsAuthenticated])
 def me(request):
 
     # Session-based authentication

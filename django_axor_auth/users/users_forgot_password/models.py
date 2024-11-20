@@ -17,6 +17,10 @@ class ForgotPassword(models.Model):
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(default=now)
 
+    class Meta:
+        db_table = 'axor_forgot_password'
+        ordering = ['-created_at']
+
     objects = ForgotPasswordManager()
 
     def __str__(self):

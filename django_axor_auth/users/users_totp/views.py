@@ -2,15 +2,15 @@ from django.utils.encoding import force_str
 from django.utils.timezone import now
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from ..permissions import HasSessionOrTokenActive
-from django.conf import settings
+from django_axor_auth.users.permissions import IsAuthenticated
+from django_axor_auth.users.users_utils.active_user import get_active_user
+from django_axor_auth.utils.error_handling.error_message import ErrorMessage
+from django_axor_auth.configurator import config
 from .models import Totp
-from ..users_utils.active_user import get_active_user
-from ...utils.error_handling.error_message import ErrorMessage
 
 
 @api_view(['POST'])
-@permission_classes([HasSessionOrTokenActive])
+@permission_classes([IsAuthenticated])
 def totp_init(request):
     # Get user
     user = get_active_user(request)
@@ -28,12 +28,12 @@ def totp_init(request):
     return Response(data={
         'key': key,
         'backup_codes': backup_codes,
-        'provision': f"otpauth://totp/{settings.AXOR_AUTH.APP_NAME}:{user.email.replace('@','%40')}?secret={key}&issuer={settings.AXOR_AUTH.APP_NAME}"
+        'provision': f"otpauth://totp/{config.APP_NAME}:{user.email.replace('@','%40')}?secret={key}&issuer={config.APP_NAME}"
     }, status=201)
 
 
 @api_view(['POST'])
-@permission_classes([HasSessionOrTokenActive])
+@permission_classes([IsAuthenticated])
 def totp_enable(request):
     """ Enable TOTP for the user after user initiates the TOTP.
 
@@ -81,7 +81,7 @@ def totp_enable(request):
 
 
 @api_view(['PUT'])
-@permission_classes([HasSessionOrTokenActive])
+@permission_classes([IsAuthenticated])
 def totp_disable(request):
     """ Disable TOTP for the user.
 
@@ -107,7 +107,7 @@ def totp_disable(request):
 
 
 @api_view(['POST'])
-@permission_classes([HasSessionOrTokenActive])
+@permission_classes([IsAuthenticated])
 def totp_new_backup_codes(request):
     """
     Generate new backup codes for the user. Invalidates the old backup codes.
