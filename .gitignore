@@ -6,8 +6,12 @@ venv
 
 db/
 key.bin
-.tar.gz
+*.tar.gz
+
+dist/
+build/
 
 # django
 __pycache__/
 migrations/
+*.egg-info

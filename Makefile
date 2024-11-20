@@ -4,6 +4,13 @@ apps := users users_sessions users_totp logs users_forgot_password users_app_tok
 
 .PHONY: all
 
+build:
+	rm -rf dist
+	.venv/bin/python -m build
+
+publish:
+	.venv/bin/python -m twine upload dist/*
+
 venv:
 	rm -rf .venv
 	python3 -m venv .venv

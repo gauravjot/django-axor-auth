@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+recursive-include django-axor-auth/ *
+prune core
+global-exclude */__pycache__/*
+global-exclude */migrations/*
+global-exclude *.py[co]

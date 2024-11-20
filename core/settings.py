@@ -24,6 +24,26 @@ FORGET_PASSWORD_LOCKOUT_TIME = 24  # hours (To prevent bad actors)
 TOTP_NUM_OF_BACKUP_CODES = 8
 TOTP_BACKUP_CODE_LENGTH = 8  # keep it more than 6 to differentiate from TOTP code
 
+AXOR_AUTH = dict(
+    AUTH_COOKIE_NAME='axor_auth',
+    AUTH_COOKIE_AGE=60 * 60 * 24 * 7,  # 1 week
+    AUTH_COOKIE_SECURE=config('AUTH_COOKIE_SECURE', default=False, cast=bool),
+    AUTH_COOKIE_SAMESITE=config('AUTH_COOKIE_SAMESITE', default='Lax'),
+    AUTH_COOKIE_DOMAIN=config('AUTH_COOKIE_DOMAIN', default=None),
+    FORGET_PASSWORD_LINK_TIMEOUT=FORGET_PASSWORD_LINK_TIMEOUT,
+    FORGET_PASSWORD_LOCKOUT_TIME=FORGET_PASSWORD_LOCKOUT_TIME,
+    TOTP_NUM_OF_BACKUP_CODES=TOTP_NUM_OF_BACKUP_CODES,
+    TOTP_BACKUP_CODE_LENGTH=TOTP_BACKUP_CODE_LENGTH,
+    SMTP_USE_TLS=config('SMTP_USE_TLS', default=False, cast=bool),
+    SMTP_USE_SSL=config('SMTP_USE_SSL', default=False, cast=bool),
+    SMTP_HOST=config('SMTP_HOST', default=None),
+    SMTP_PORT=config('SMTP_PORT', default=None),
+    SMTP_USER=config('SMTP_USER', default=None),
+    SMTP_PASSWORD=config('SMTP_PASSWORD', default=None),
+    SMTP_DEFAULT_SEND_FROM=config('SMTP_DEFAULT_SEND_FROM', default=None),
+    FRONTEND_URL=config('FRONTEND_URL', default=None),
+)
+
 
 # ----- Django Settings
 #
@@ -48,13 +68,13 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'logs',
+    'django-axor-auth.logs',
 
-    'users',
-    'users.users_sessions',
-    'users.users_totp',
-    'users.users_forgot_password',
-    'users.users_app_tokens',
+    'django-axor-auth.users',
+    'django-axor-auth.users.users_sessions',
+    'django-axor-auth.users.users_totp',
+    'django-axor-auth.users.users_forgot_password',
+    'django-axor-auth.users.users_app_tokens',
 ]
 
 MIDDLEWARE = [
@@ -68,15 +88,15 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
     # Apply on request
-    "core.middlewares.APIRequestFormatMiddleware",
-    "core.middlewares.HeaderRequestedByMiddleware",
-    "users.users_app_tokens.middlewares.AppTokenMiddleware",
-    "core.middlewares.RequestOriginMiddleware",
-    "users.users_sessions.middlewares.SessionMiddleware",
+    "django-axor-auth.extras.middlewares.APIRequestFormatMiddleware",
+    "django-axor-auth.extras.middlewares.HeaderRequestedByMiddleware",
+    "django-axor-auth.users.users_app_tokens.middlewares.AppTokenMiddleware",
+    "django-axor-auth.extras.middlewares.RequestOriginMiddleware",
+    "django-axor-auth.users.users_sessions.middlewares.SessionMiddleware",
 
     # Apply on response
-    "logs.middlewares.APILogMiddleware",
-    "core.middlewares.FormulateResponseMiddleware",
+    "django-axor-auth.logs.middlewares.APILogMiddleware",
+    "django-axor-auth.extras.middlewares.FormulateResponseMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'
