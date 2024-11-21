@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-axor-auth"
-version = "0.1.1"
+version = "0.1.2"
 description = "Django authentication API using Django Rest Framework."
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -24,5 +24,5 @@ classifiers = [
 homepage = "https://github.com/gauravjot/django-axor-auth"
 
 [tool.setuptools.packages.find]
-include = ["django_axor_auth.*", "LICENSE", "README.md"]
+include = ["django_axor_auth.*", "LICENSE", "README.md", "django_axor_auth"]
 exclude = ["migrations", "__pycache__"]

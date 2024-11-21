@@ -1,3 +1,4 @@
+from typing import Optional
 from .models import User
 from django_axor_auth.middlewares import is_web
 # Session Imports
@@ -7,7 +8,7 @@ from .users_app_tokens.utils import get_active_token
 from .serializers import UserSerializer
 
 
-def get_user(email):
+def get_user(email) -> Optional[User]:
     """
     Get active User object
 
@@ -23,20 +24,27 @@ def get_user(email):
         return None
 
 
-def get_request_user(request):
+def get_request_user(request) -> User:
+    """Get the authenticated user from the request.
+    This method should only be used if authentication decorator is used in the view to confirm that user is logged in.
+
+    Args:
+        request (_type_): _description_
+
+    Returns:
+        User: _description_
+    """
     if is_web(request):
         # Check if session is active
         session = get_active_session(request)
         if session is not None:
             return session.user
-    # Check if token is active
+    # if session-based auth is not used the it has to be app token
     app_token = get_active_token(request)
-    if app_token is not None:
-        return app_token.user
-    return None
+    return app_token.user
 
 
-def add_user(email, password, first_name, last_name, created_by=None, serialized=False):
+def add_user(email, password, first_name, last_name, created_by=None, serialized=False) -> User | Exception:
     """
     Add a new User
 
@@ -66,7 +74,7 @@ def add_user(email, password, first_name, last_name, created_by=None, serialized
         raise Exception(e)
 
 
-def change_password(user, new_password):
+def change_password(user, new_password) -> User | Exception:
     """
     Change user password
 
@@ -74,7 +82,7 @@ def change_password(user, new_password):
         user (User): User object
         new_password (str): New password
 
-    Returns: User or None
+    Returns: User or Exception
     """
     try:
         user.set_password(new_password)
@@ -84,7 +92,7 @@ def change_password(user, new_password):
         raise Exception(e)
 
 
-def change_email(user, new_email):
+def change_email(user, new_email) -> User | Exception:
     """
     Change user email
 
@@ -92,7 +100,7 @@ def change_email(user, new_email):
         user (User): User object
         new_email (str): New email
 
-    Returns: User or None
+    Returns: User or Exception
     """
     try:
         user.email = new_email
@@ -102,7 +110,7 @@ def change_email(user, new_email):
         raise Exception(e)
 
 
-def change_name(user, new_first_name, new_last_name):
+def change_name(user, new_first_name, new_last_name) -> User | Exception:
     """
     Change user name
 
@@ -111,7 +119,7 @@ def change_name(user, new_first_name, new_last_name):
         new_first_name (str): New first name
         new_last_name (str): New last name
 
-    Returns: User or None
+    Returns: User or Exception
     """
     try:
         user.first_name = new_first_name
@@ -122,14 +130,14 @@ def change_name(user, new_first_name, new_last_name):
         raise Exception(e)
 
 
-def disable_user(user: User):
+def disable_user(user: User) -> User | Exception:
     """
     Disable user
 
     Args:
         user (User): User object
 
-    Returns: User or None
+    Returns: User or Exception
     """
     try:
         user.is_active = False
@@ -139,14 +147,14 @@ def disable_user(user: User):
         raise Exception(e)
 
 
-def enable_user(user):
+def enable_user(user) -> User | Exception:
     """
     Enable user
 
     Args:
         user (User): User object
 
-    Returns: User or None
+    Returns: User or Exception
     """
     try:
         user.is_active = True
@@ -156,14 +164,14 @@ def enable_user(user):
         raise Exception(e)
 
 
-def delete_user(user):
+def delete_user(user) -> User | Exception:
     """
     Delete user
 
     Args:
         user (User): User object
 
-    Returns: User or None
+    Returns: User or Exception
     """
     try:
         user.delete()
