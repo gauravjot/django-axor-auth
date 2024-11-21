@@ -165,7 +165,6 @@ def logout(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def me(request):
-
     # Session-based authentication
     if is_web(request):
         session = get_active_session(request)
@@ -176,9 +175,7 @@ def me(request):
     # Token-based authentication
     app_token = get_active_token(request)
     if app_token is not None:
-        return Response(data=dict(
-            user=UserSerializer(app_token.user).data
-        ), status=200)
+        return Response(data=UserSerializer(app_token.user).data, status=200)
     # No valid active session or token found
     return ErrorMessage(
         detail='No active session or token found.',
