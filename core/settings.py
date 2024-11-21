@@ -25,6 +25,7 @@ TOTP_NUM_OF_BACKUP_CODES = 8
 TOTP_BACKUP_CODE_LENGTH = 8  # keep it more than 6 to differentiate from TOTP code
 
 AXOR_AUTH = dict(
+    APP_NAME=APP_NAME,
     AUTH_COOKIE_NAME='axor_auth',
     AUTH_COOKIE_AGE=60 * 60 * 24 * 7,  # 1 week
     AUTH_COOKIE_SECURE=config('AUTH_COOKIE_SECURE', default=False, cast=bool),
@@ -68,13 +69,15 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'django-axor-auth.logs',
+    # logs
+    'django_axor_auth.logs',
 
-    'django-axor-auth.users',
-    'django-axor-auth.users.users_sessions',
-    'django-axor-auth.users.users_totp',
-    'django-axor-auth.users.users_forgot_password',
-    'django-axor-auth.users.users_app_tokens',
+    # users
+    'django_axor_auth.users',
+    'django_axor_auth.users.users_sessions',
+    'django_axor_auth.users.users_totp',
+    'django_axor_auth.users.users_forgot_password',
+    'django_axor_auth.users.users_app_tokens',
 ]
 
 MIDDLEWARE = [
@@ -88,15 +91,15 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
     # Apply on request
-    "django-axor-auth.extras.middlewares.APIRequestFormatMiddleware",
-    "django-axor-auth.extras.middlewares.HeaderRequestedByMiddleware",
-    "django-axor-auth.users.users_app_tokens.middlewares.AppTokenMiddleware",
-    "django-axor-auth.extras.middlewares.RequestOriginMiddleware",
-    "django-axor-auth.users.users_sessions.middlewares.SessionMiddleware",
+    # # required
+    "django_axor_auth.middlewares.HeaderRequestedByMiddleware",
+    "django_axor_auth.users.middlewares.ActiveUserMiddleware",
+    # # extras
+    "django_axor_auth.extras.middlewares.VerifyRequestOriginMiddleware",
+    "django_axor_auth.extras.middlewares.ValidateJsonMiddleware",
 
     # Apply on response
-    "django-axor-auth.logs.middlewares.APILogMiddleware",
-    "django-axor-auth.extras.middlewares.FormulateResponseMiddleware",
+    "django_axor_auth.logs.middlewares.APILogMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title><%=title %> | <%= config.meta.app_name %></title>
+		<% if (description) { %>
+		<meta name="description" content="<%= description %>" />
+		<% } %> <%- include ('./partials/head_tag.ejs', {config: config}) %>
+	</head>
+	<body>
+		<%- include ('./partials/nav.ejs', {config: config}) %>
+		<div id="loading"></div>
+		<div class="container">
+			<%- include ('./partials/sidebar.ejs', {config: config}) %>
+			<div
+				class="sidebar-open mt-16 flex h-[calc(100%-4rem)] flex-col md:gap-6 xl:flex-row xl:gap-12 2xl:gap-16 3xl:gap-32 4xl:gap-48"
+				id="content"
+			>
+				<div class="order-2 mb-8 flex-1 pt-px @container/doc" id="md-content">
+					<!-- Content starts -->
+					<div class="mt-8 text-zinc-500 dark:text-zinc-400">
+						<% if (date) { %> Updated — <%= date %> <% } %>
+					</div>
+					<h1><%= title %></h1>
+					<p><%= description %></p>
+					<div><%- post %></div>
+					<div id="doc-pn" class="mt-16 grid gap-5 @lg/doc:grid-cols-2 @lg/doc:gap-8">
+						<div class="col-span-1">
+							<% if(prev){ %>
+							<a href="<%= prev %>" class="next-prev-btn" <% if(config.settings.dynamic_hydration){ %> data-type="dynamic" <% } %>>
+								<div class="flex py-0.5 place-items-center text-zinc-700 dark:text-zinc-300">
+                  <div class="text-zinc-500 dark:text-zinc-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                  </div>
+                  <div class="flex-1 font-medium">
+                    <div class="text-sm">Previous</div>
+                    <div class="mt-0.5 w-[calc(100%)] truncate font-medium"><%= prevTitle %></div></div>
+								</div>
+							</a>
+							<% } %>
+						</div>
+						<div class="col-span-1">
+							<% if(next){ %>
+							<a href="<%= next %>" class="next-prev-btn"  <% if(config.settings.dynamic_hydration){ %> data-type="dynamic" <% } %>>
+								<div class="flex py-0.5 place-items-center text-zinc-700 dark:text-zinc-300">
+                  <div class="flex-1 font-medium text-left">
+                    <div class="text-sm">Next</div>
+                    <div class="mt-0.5 w-[calc(100%)] truncate font-medium"><%= nextTitle %></div>
+                  </div>
+                  <div class="text-zinc-500 dark:text-zinc-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </div>
+                </div>
+							</a>
+							<% } %>
+						</div>
+					</div>
+					<!-- Content ends -->
+				</div>
+				<!-- Table of Contents starts -->
+				<div
+					id="toc-sidebar"
+					class="order-1 flex-1 md:flex-initial xl:sticky xl:top-16 xl:order-3 xl:max-h-[calc(100vh-4rem)] xl:overflow-auto"
+				>
+					<div class="mt-8 border rounded-md xl:border-none dark:border-zinc-900">
+						<div
+							class="text-sm font-medium toc-toggle-btn text-zinc-700 dark:text-zinc-300"
+							onclick="toggleToc()"
+						>
+							TABLE OF CONTENTS
+						</div>
+						<div id="toc-container" class="px-4 xl:p-0" data-hidden="false"><%- toc %></div>
+					</div>
+				</div>
+				<!-- Table of Contents ends -->
+			</div>
+		</div>
+		<%- include ('./partials/footer.ejs', {config: config}) %>
+	</body>
+</html>

@@ -1,0 +1,50 @@
+<!-- Navigation starts -->
+<nav
+	id="navbar"
+	class="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black"
+>
+	<div class="container flex h-16 place-items-center gap-2 sm:gap-4">
+		<div class="flex flex-1 place-items-center gap-2 leading-4">
+			<!-- Sidebar toggle button (appears when sidebar closed) -->
+			<div id="nav-sidebar-toggle">
+				<button
+					onClick="toggleSidebar()"
+					title="Toggle Sidebar"
+					class="flex size-10 place-items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-zinc-800"
+				>
+					<span class="ic-hamburger"></span>
+				</button>
+			</div>
+			<!-- Siedbar toggle button ends -->
+			<a
+				href="/"
+				class="flex place-items-center gap-2 truncate text-ellipsis text-lg font-bold text-black hover:no-underline sm:text-2xl dark:text-white"
+			>
+				<% var nav_logo = config.meta.navbar.logo; %> <% if (nav_logo.style === 'icon_with_text') {
+				%>
+				<img src="<%= nav_logo.variations.icon_with_text.icon %>" alt="" class="size-6 lg:size-7" />
+				<span><%= nav_logo.variations.icon_with_text.text %></span>
+				<% } else if (nav_logo.style === 'icon_only') { %>
+				<img src="<%= nav_logo.variations.icon_only.icon %>" alt="" class="size-6 lg:size-7" />
+				<% } else if (nav_logo.style === 'text_only') { %>
+				<span><%= nav_logo.variations.text_only.text %></span>
+				<% } else if (nav_logo.style === 'full_logo') { %> <% let full_logo =
+				nav_logo.variations.full_logo %>
+				<img
+					src="<%= full_logo.logo %>"
+					style="aspect-ratio: <%= full_logo.width %> / <%= full_logo.height %>"
+					alt=""
+					class="h-6 lg:h-7"
+				/>
+				<% } %>
+			</a>
+		</div>
+		<div class="flex place-items-center gap-2 sm:gap-6">
+			<!-- theme toggler -->
+			<div class="darkmode-toggle scale-75 md:scale-90" onClick="toggleTheme()">
+				<button aria-label="Toggle Color Theme"></button>
+			</div>
+		</div>
+	</div>
+</nav>
+<!-- Navigation ends -->

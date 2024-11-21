@@ -1,0 +1,58 @@
+{
+	"name": "planum-docs",
+	"version": "1.7.0",
+	"description": "Pure Markdown Docs as a Website.",
+	"main": "./src/server.js",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/gauravjot/planum-docs"
+	},
+	"scripts": {
+		"css": "npx tailwindcss -i ./src/styles/main.css -o ./src/pd-static/styles.css --minify",
+		"watch-css": "npx tailwindcss -i ./src/styles/main.css -o ./src/pd-static/styles.css --minify --watch",
+		"nodemon": "npx nodemon ./src/server.js",
+		"dev": "run-p nodemon",
+		"build": "npm run css > /dev/null 2>&1; npm run test && node ./src/internal/build.js",
+		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
+	},
+	"author": "Gauravjot Garaya",
+	"license": "MIT",
+	"dependencies": {
+		"@tailwindcss/container-queries": "^0.1.1",
+		"ascii2mathml": "^0.7.1",
+		"body-parse": "^0.1.0",
+		"ejs": "^3.1.10",
+		"express": "^4.19.2",
+		"gray-matter": "^4.0.3",
+		"highlight.js": "^11.9.0",
+		"katex": "^0.16.10",
+		"markdown-it": "^14.1.0",
+		"markdown-it-anchor": "^8.6.7",
+		"markdown-it-code-copy": "^0.1.2",
+		"markdown-it-footnote": "^4.0.0",
+		"markdown-it-texmath": "^1.0.0",
+		"node-html-parser": "^6.1.13"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"chalk": "^5.3.0",
+		"eslint": "^8.56.0",
+		"eslint-config-standard-with-typescript": "^43.0.1",
+		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-n": "^16.6.2",
+		"eslint-plugin-promise": "^6.1.1",
+		"eslint-plugin-react": "^7.34.1",
+		"html-minifier": "^4.0.0",
+		"jest": "^29.7.0",
+		"npm-run-all": "^4.1.5",
+		"prettier": "^3.2.5",
+		"prettier-plugin-ejs": "^1.0.3",
+		"prettier-plugin-tailwindcss": "^0.5.14",
+		"tailwindcss": "^3.4.3",
+		"typescript": "^5.4.5"
+	},
+	"jest": {
+		"transform": {}
+	}
+}
