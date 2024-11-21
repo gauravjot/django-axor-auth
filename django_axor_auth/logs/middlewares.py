@@ -1,6 +1,7 @@
 import json
 from .models import ApiCallLog
 from .log_response import LogResponse
+from django_axor_auth.configurator import config
 
 
 class APILogMiddleware:
@@ -15,7 +16,7 @@ class APILogMiddleware:
         # the view is called.
 
         # Don't run on non-API requests
-        if not request.path.startswith('/api'):
+        if not request.path.startswith(config.URI_PREFIX):
             return response
         # Create log
         try:

@@ -1,5 +1,5 @@
 from django.core.mail import send_mail, get_connection
-from django.conf import settings
+from django_axor_auth.configurator import config
 
 
 def email_send_helper(email_to: str, subject: str, template: str) -> int:
@@ -17,7 +17,7 @@ def email_send_helper(email_to: str, subject: str, template: str) -> int:
     try:
         with getEmailConnection() as connection:
             html_message = template
-            from_email = settings.AXOR_AUTH['SMTP_DEFAULT_SEND_FROM']
+            from_email = config.SMTP_DEFAULT_SEND_FROM
             return send_mail(subject=subject,
                              html_message=html_message,
                              from_email=from_email,
@@ -28,19 +28,19 @@ def email_send_helper(email_to: str, subject: str, template: str) -> int:
 
 
 def getEmailConnection():
-    if settings.AXOR_AUTH['SMTP_USE_TLS'] == 'True':
+    if config.SMTP_USE_TLS:
         return get_connection(
-            host=settings.AXOR_AUTH['SMTP_HOST'],
-            port=settings.AXOR_AUTH['SMTP_PORT'],
-            username=settings.AXOR_AUTH['SMTP_USER'],
-            password=settings.AXOR_AUTH['SMTP_PASSWORD'],
+            host=config.SMTP_HOST,
+            port=config.SMTP_PORT,
+            username=config.SMTP_USER,
+            password=config.SMTP_PASSWORD,
             use_tls=True,
         )
     else:
         return get_connection(
-            host=settings.AXOR_AUTH['SMTP_HOST'],
-            port=settings.AXOR_AUTH['SMTP_PORT'],
-            username=settings.AXOR_AUTH['SMTP_USER'],
-            password=settings.AXOR_AUTH['SMTP_PASSWORD'],
+            host=config.SMTP_HOST,
+            port=config.SMTP_PORT,
+            username=config.SMTP_USER,
+            password=config.SMTP_PASSWORD,
             use_ssl=True,
         )

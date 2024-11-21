@@ -4,7 +4,7 @@ from django.utils.encoding import force_str
 from .users_app_tokens.models import AppToken
 from .users_sessions.models import Session
 from .users_sessions.utils import getClientIP, getUserAgent
-from ..configurator import config
+from django_axor_auth.configurator import config
 
 
 class ActiveUserMiddleware:

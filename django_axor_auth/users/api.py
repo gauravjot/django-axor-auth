@@ -1,5 +1,5 @@
 from .models import User
-from ..extras.middlewares import is_web
+from django_axor_auth.middlewares import is_web
 # Session Imports
 from .users_sessions.utils import get_active_session
 # App Token Imports

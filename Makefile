@@ -2,7 +2,7 @@
 
 apps := users users_sessions users_totp logs users_forgot_password users_app_tokens
 
-.PHONY: all
+.PHONY: build publish venv resetdb superuser getready run docs su
 
 build:
 	rm -rf dist
@@ -30,6 +30,9 @@ getready: venv resetdb
 
 run:
 	.venv/bin/python manage.py runserver 0.0.0.0:8001
+
+docs:
+	npm update --prefix docs && npm run dev --prefix docs
 
 su:
 	.venv/bin/python manage.py createsuperuser

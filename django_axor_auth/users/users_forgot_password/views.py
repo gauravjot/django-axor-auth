@@ -8,7 +8,7 @@ from ..models import UserPasswordChange
 from .models import ForgotPassword
 from .serializers import HealthyForgotPasswordSerializer
 from .utils import getClientIP
-from django.conf import settings
+from django_axor_auth.configurator import config
 
 
 @api_view(['POST'])
@@ -28,7 +28,7 @@ def forgot_password(request):
     )
     if key and fp:
         # Send email with key
-        url = f'{settings.AXOR_AUTH["FRONTEND_URL"]}/forgot-password/complete?token={key}'
+        url = f'{config.FRONTEND_URL}/forgot-password/complete?token={key}'
         send_forgot_password_email(
             email=force_str(fp.user.email),
             reset_url=url,

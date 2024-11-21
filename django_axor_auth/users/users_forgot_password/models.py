@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from .utils import hash_this
 from .managers import ForgotPasswordManager
 from ..models import User
-from django.conf import settings
+from django_axor_auth.configurator import config
 
 
 class ForgotPassword(models.Model):
@@ -38,7 +38,7 @@ class ForgotPassword(models.Model):
         if self.is_used:
             return False
         # Check if key was created more than x minutes ago
-        if (now() - self.created_at) > timedelta(minutes=settings.AXOR_AUTH['FORGET_PASSWORD_LINK_TIMEOUT']):
+        if (now() - self.created_at) > timedelta(minutes=config.FORGET_PASSWORD_LINK_TIMEOUT):
             self.is_valid = False
             self.save()
             return False

@@ -2,7 +2,7 @@ import string
 import random
 import hashlib
 from secrets import token_urlsafe
-from django.conf import settings
+from django_axor_auth.configurator import config
 
 
 def generate_backup_codes():
@@ -12,9 +12,9 @@ def generate_backup_codes():
         list: A list of backup codes
     """
     backup_codes = []
-    for _ in range(settings.AXOR_AUTH['TOTP_NUM_OF_BACKUP_CODES']):
+    for _ in range(config.TOTP_NUM_OF_BACKUP_CODES):
         backup_code = ''.join(random.choices(
-            string.ascii_lowercase + string.digits, k=settings.AXOR_AUTH['TOTP_BACKUP_CODE_LENGTH']))
+            string.ascii_lowercase + string.digits, k=config.TOTP_BACKUP_CODE_LENGTH))
         backup_codes.append(backup_code)
     return backup_codes
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.conf import settings
+from django_axor_auth.configurator import config
 
 
 def base_template(subject, headline, message: list[str], button_text=None, button_link=None):
@@ -12,12 +12,12 @@ def base_template(subject, headline, message: list[str], button_text=None, butto
         `button_text` (str): Optional. Text for the button
         `button_link` (str): Optional. Link for the button
     """
-    company_name = settings.AXOR_AUTH["APP_NAME"]
+    company_name = config.APP_NAME
     footer_text = "We may send emails in future if they be beneficial for you or to convey any policy changes. We will never send marketing emails."
     footer_links = [
         {
             "text": "Website",
-            "link": settings.AXOR_AUTH["FRONTEND_URL"]
+            "link": config.FRONTEND_URL
         }
     ]
     year = datetime.now().year
@@ -59,7 +59,7 @@ def base_template(subject, headline, message: list[str], button_text=None, butto
                                         <tr>
                                         <td>
                                             <p class="company-name">
-                                                <a href="{settings.AXOR_AUTH["FRONTEND_URL"]}" target="_blank" class="logo">{company_name}</a>
+                                                <a href="{config.FRONTEND_URL}" target="_blank" class="logo">{company_name}</a>
                                             </p>
                                             <br/>
                                             <h1>{headline}</h1>

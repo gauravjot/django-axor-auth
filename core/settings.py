@@ -91,12 +91,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
     # Apply on request
-    # # extras
-    "django_axor_auth.extras.middlewares.VerifyRequestOriginMiddleware",
-    "django_axor_auth.extras.middlewares.ValidateJsonMiddleware",
     # # required
     "django_axor_auth.middlewares.HeaderRequestedByMiddleware",
     "django_axor_auth.users.middlewares.ActiveUserMiddleware",
+    # # extras
+    "django_axor_auth.extras.middlewares.VerifyRequestOriginMiddleware",
+    "django_axor_auth.extras.middlewares.ValidateJsonMiddleware",
 
     # Apply on response
     "django_axor_auth.logs.middlewares.APILogMiddleware",

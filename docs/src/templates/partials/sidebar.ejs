@@ -1,0 +1,58 @@
+<!-- Sidebar starts -->
+<div
+	id="sidebar"
+	data-hidden="false"
+	class="fixed bottom-0 top-14 z-40 mt-px flex max-h-[calc(100svh-3.5rem)] flex-col overflow-hidden"
+>
+	<div class="relative h-[calc(100%-2.27rem)] flex-1 overflow-y-auto">
+		<!-- Sidebar menu starts -->
+		<% if (config.sidebar.links.main.length > 0) { %>
+		<div class="mt-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">LINKS</div>
+		<ul id="sidebar-nav-list" class="my-4">
+			<% for(var i=0; i < config.sidebar.links.main.length; i++) { %> <%-
+			config.sidebar.links.main[i] %> <% } %>
+		</ul>
+		<% } %>
+		<!-- DO NOT EDIT 5 lINES BELOW-->
+		<div class="mt-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">DOCS</div>
+		<!-- Doc list for navigation -->
+		<div id="sidebar-doc-list" class="my-4"><%- docs %></div>
+
+		<!-- Sidebar menu ends -->
+	</div>
+	<!-- Sidebar footer starts -->
+	<div class="flex border-t text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+		<div class="foot-links flex h-14 flex-1 place-items-center gap-3">
+			<% if (config.sidebar.links.foot.length > 0) { %> <% for(var i=0; i <
+			config.sidebar.links.foot.length; i++) { %> <%- config.sidebar.links.foot[i] %> <% } %> <% }
+			%>
+		</div>
+
+		<!-- NO NEED TO CHANGE ANYTHING BELOW -->
+
+		<!-- Sidebar toggle button (appears when sidebar open) -->
+		<div id="sidebar-toggle">
+			<button
+				onClick="toggleSidebar()"
+				title="Toggle Sidebar"
+				class="flex size-10 place-items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-zinc-800"
+			>
+				<span class="ic-sidebar"></span>
+			</button>
+		</div>
+		<!-- Siedbar toggle button ends -->
+	</div>
+	<!-- Sidebar toggle button (appears when sidebar closed) -->
+	<div id="sidebar-toggle-closed">
+		<button
+			onClick="toggleSidebar()"
+			title="Toggle Sidebar"
+			class="flex size-10 place-items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-zinc-800"
+		>
+			<span class="ic-sidebar"></span>
+		</button>
+	</div>
+	<!-- Siedbar toggle button ends -->
+	<!-- Sidebar footer ends -->
+</div>
+<!-- Sidebar ends -->

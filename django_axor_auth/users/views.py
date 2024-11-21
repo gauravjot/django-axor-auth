@@ -1,9 +1,10 @@
 from django.utils.encoding import force_str
+from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from ..utils.error_handling.error_message import ErrorMessage
-from ..extras.middlewares import is_web
-from django.conf import settings
+from django_axor_auth.utils.error_handling.error_message import ErrorMessage
+from django_axor_auth.middlewares import is_web
+from django_axor_auth.configurator import config
 # JWT
 import jwt
 # Session Imports
@@ -94,7 +95,7 @@ def login(request):
                 status=200
             )
             response.set_cookie(
-                key=settings.AXOR_AUTH['AUTH_COOKIE_NAME'],
+                key=config.AUTH_COOKIE_NAME,
                 value=jwt.encode(
                     {
                         "session_key": key
@@ -104,9 +105,9 @@ def login(request):
                 ),
                 expires=session.expire_at,
                 httponly=True,
-                secure=settings.AXOR_AUTH['AUTH_COOKIE_SECURE'],
-                samesite=settings.AXOR_AUTH['AUTH_COOKIE_SAMESITE'],
-                domain=settings.AXOR_AUTH['AUTH_COOKIE_DOMAIN']
+                secure=config.AUTH_COOKIE_SECURE,
+                samesite=config.AUTH_COOKIE_SAMESITE,
+                domain=config.AUTH_COOKIE_DOMAIN
             )
             return response
         else:
@@ -150,8 +151,8 @@ def logout(request):
                        get_active_session(request).id)
         response = Response(status=200)
         response.delete_cookie(
-            key=settings.AXOR_AUTH['AUTH_COOKIE_NAME'],
-            domain=settings.AXOR_AUTH['AUTH_COOKIE_DOMAIN']
+            key=config.AUTH_COOKIE_NAME,
+            domain=config.AUTH_COOKIE_DOMAIN
         )
         return response
     else:

@@ -1,9 +1,9 @@
+from django.core.mail import send_mail
 from .templates.new_user_account import new_user_account_template
 from .templates.forgot_password import forgot_password_template
 from .templates.reset_password_success import reset_password_success_template
-from ....utils.emailing.helper import getEmailConnection
-from django.core.mail import send_mail
-from django.conf import settings
+from django_axor_auth.utils.emailing.helper import getEmailConnection
+from django_axor_auth.configurator import config
 
 
 def send_welcome_email(first_name: str, verification_url: str, email: str, subject='Welcome to Pluto Health'):
@@ -25,7 +25,7 @@ def send_welcome_email(first_name: str, verification_url: str, email: str, subje
             return send_mail(subject=subject,
                              message=message,
                              html_message=template,
-                             from_email=settings.AXOR_AUTH['SMTP_DEFAULT_SEND_FROM'],
+                             from_email=config.SMTP_DEFAULT_SEND_FROM,
                              recipient_list=[email,],
                              connection=connection)
     except Exception as e:
@@ -52,7 +52,7 @@ def send_forgot_password_email(first_name: str, reset_url: str, email: str, ip: 
             return send_mail(subject=subject,
                              message=message,
                              html_message=template,
-                             from_email=settings.AXOR_AUTH['SMTP_DEFAULT_SEND_FROM'],
+                             from_email=config.SMTP_DEFAULT_SEND_FROM,
                              recipient_list=[email,],
                              connection=connection)
     except Exception as e:
@@ -76,7 +76,7 @@ def send_password_changed_email(first_name: str, email: str, subject='Password w
             return send_mail(subject=subject,
                              message=message,
                              html_message=template,
-                             from_email=settings.AXOR_AUTH['SMTP_DEFAULT_SEND_FROM'],
+                             from_email=config.SMTP_DEFAULT_SEND_FROM,
                              recipient_list=[email,],
                              connection=connection)
     except Exception as e:
