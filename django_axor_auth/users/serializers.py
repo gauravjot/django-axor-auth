@@ -1,6 +1,6 @@
 from django.utils.encoding import force_str
 from rest_framework import serializers
-from .models import User, UserPasswordChange
+from .models import User, VerifyEmail
 import re
 
 # Validators
@@ -105,6 +105,16 @@ class PasswordSerializer(serializers.Serializer):
         return validate_password(force_str(data['password']))
 
 
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(validators=[validate_email])
+
+    def validate(self, data):
+        # Check if email is provided
+        if 'email' not in data:
+            raise serializers.ValidationError('Email is required.')
+        return validate_email(force_str(data['email']))
+
+
 class AddUserSerializer(serializers.Serializer):
     email = serializers.EmailField(validators=[validate_email])
     first_name = serializers.CharField()
@@ -119,13 +129,11 @@ class AddUserSerializer(serializers.Serializer):
         return data
 
 
-class UserPasswordChangeSerializer(serializers.ModelSerializer):
+class VerifyEmailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserPasswordChange
-        fields = [
-            'date_last_changed_by_user',
-            'date_last_changed_by_admin',
-            'last_changed_by_admin',
-            'last_pswd_change_method_by_user',
-            'pswd_change_lock_til',
-        ]
+        model = VerifyEmail
+        fields = ['id', 'user', 'token', 'created_at', 'is_consumed']
+        extra_kwargs = {
+            'user': {'required': True},
+            'token': {'required': True},
+        }

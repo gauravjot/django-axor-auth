@@ -101,5 +101,6 @@ def delete_all_app_tokens(user):
 
 
 def delete_all_app_tokens_except(user, app_token_id):
-    AppToken.filter(user=user, is_valid=True).exclude(pk=app_token_id).delete()
+    AppToken.filter(user=user, is_valid=True).exclude(
+        pk=app_token_id).update(is_valid=False)
     return None

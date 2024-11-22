@@ -1,4 +1,4 @@
-from .....utils.emailing.base_template import base_template
+from django_axor_auth.utils.emailing.base_template import base_template
 
 
 def forgot_password_template(first_name, url, ip, email_subject='Reset your password'):

@@ -1,4 +1,4 @@
-from .....utils.emailing.base_template import base_template
+from django_axor_auth.utils.emailing.base_template import base_template
 
 
 def reset_password_success_template(first_name, email_subject='Password was changed'):

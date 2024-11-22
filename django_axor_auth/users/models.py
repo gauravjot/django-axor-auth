@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.utils.timezone import now
-from .managers import UserManager, UserPasswordChangeManager
+from .managers import UserManager
 import bcrypt
 
 
@@ -14,12 +14,9 @@ class User(models.Model):
     last_name = models.CharField(max_length=150)
     timezone = models.CharField(max_length=150, default='America/Vancouver')
     is_active = models.BooleanField(default=True)
+    is_email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=now)
-    created_by = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, related_name='user_created_by', null=True, blank=True)
     updated_at = models.DateTimeField(default=now)
-    updated_by = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, related_name='user_updated_by', null=True, blank=True)
 
     class Meta:
         db_table = 'axor_users'
@@ -42,20 +39,15 @@ class User(models.Model):
             return False
 
 
-class UserPasswordChange(models.Model):
-    method_choices = (
-        ('authenticated', 'authenticated'),
-        ('forgot_password', 'forgot_password'),
-    )
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name='pswd_user', null=True, blank=True)
-    date = models.DateTimeField(default=None, null=True)
-    method = models.CharField(
-        max_length=32, choices=method_choices, default=None, null=True)
+class VerifyEmail(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64)
+    created_at = models.DateTimeField(default=now)
+    is_consumed = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'axor_user_password_change'
-        ordering = ['date']
+        db_table = 'axor_user_verify_email'
+        ordering = ['created_at']
 
-    objects = UserPasswordChangeManager()
+    def __str__(self):
+        return f"id:{self.pk}, {self.user}, {self.created} (consumed: {self.consumed})"

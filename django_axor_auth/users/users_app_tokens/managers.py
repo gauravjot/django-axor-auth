@@ -64,8 +64,6 @@ class AppTokenManager(models.Manager):
                 ua=ua,
                 is_valid=True
             )
-            if not app_token.is_valid:
-                return None
             return app_token
         except Exception as e:
             return None

@@ -220,7 +220,7 @@ hr {
 	/* inline code */
 	@apply rounded bg-slate-200/50 dark:bg-white/10;
 	@apply border border-slate-300 dark:border-zinc-200/20;
-	@apply inline break-words px-1 py-0 text-[90%] tracking-tight;
+	@apply inline break-words px-1 py-0 text-[92%] tracking-tight;
 }
 #md-content pre.good,
 #md-content pre.bad {

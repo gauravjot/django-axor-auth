@@ -1,4 +1,6 @@
 from django.core.mail import send_mail
+
+from django_axor_auth.users.users_utils.emailing.templates.email_changed import email_changed_template
 from .templates.new_user_account import new_user_account_template
 from .templates.forgot_password import forgot_password_template
 from .templates.reset_password_success import reset_password_success_template
@@ -73,6 +75,32 @@ def send_password_changed_email(first_name: str, email: str, subject='Password w
     try:
         with getEmailConnection() as connection:
             message = f"Hello {first_name},\n\nYour password was successfully changed. If you did not make this change, please contact our support immediately."
+            return send_mail(subject=subject,
+                             message=message,
+                             html_message=template,
+                             from_email=config.SMTP_DEFAULT_SEND_FROM,
+                             recipient_list=[email,],
+                             connection=connection)
+    except Exception as e:
+        return 0
+
+
+def send_email_changed_email(first_name: str, verification_url: str, email: str, subject='Email Changed Successfully!'):
+    """Send a welcome email to a new user
+
+    Args:
+        `first_name` (str): Users first name
+        `verification_key` (str): Verification token
+        `email` (str): Recipient email address.
+        `subject` (str, optional): Email subject. Defaults to 'Welcome to Pluto Health'.
+
+    Returns:
+        `int`: Returns 0 if fails.
+    """
+    template = email_changed_template(first_name, verification_url, subject)
+    try:
+        with getEmailConnection() as connection:
+            message = f"Hello {first_name},\n\nPlease verify your new email by clicking the link below.\n\n{verification_url}"
             return send_mail(subject=subject,
                              message=message,
                              html_message=template,

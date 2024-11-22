@@ -1,5 +1,5 @@
 from typing import Optional
-from .models import User
+from .models import User, VerifyEmail
 from django_axor_auth.middlewares import is_web
 # Session Imports
 from .users_sessions.utils import get_active_session
@@ -72,6 +72,18 @@ def add_user(email, password, first_name, last_name, created_by=None, serialized
             return account
     except Exception as e:
         raise Exception(e)
+
+
+def email_exists(email) -> bool:
+    """
+    Check if email exists
+
+    Args:
+        email (str): User email
+
+    Returns: bool
+    """
+    return User.objects.filter(email=email).exists()
 
 
 def change_password(user, new_password) -> User | Exception:
@@ -178,3 +190,37 @@ def delete_user(user) -> User | Exception:
         return user
     except Exception as e:
         raise Exception(e)
+
+
+# Email Verification
+
+def latest_unused_email_verification(user) -> VerifyEmail | None:
+    """
+    Get latest email verification
+
+    Args:
+        user (User): User object
+
+    Returns: VerifyEmail
+    """
+    try:
+        return VerifyEmail.objects.filter(user=user, is_consumed=False).latest('created_at')
+    except Exception as e:
+        return None
+
+
+def consume_active_email_verifications(user) -> bool:
+    """
+    Consume active email verification
+
+    Args:
+        user (User): User object
+
+    Returns: bool
+    """
+    try:
+        VerifyEmail.objects.filter(
+            user=user, is_consumed=False).update(is_consumed=True)
+        return True
+    except Exception as e:
+        return False

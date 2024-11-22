@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from datetime import timedelta
 from .utils import generate_session_key, hash_this, getClientIP, getUserAgent
+from django_axor_auth.configurator import config
 
 
 class SessionManager(models.Manager):
@@ -15,9 +16,9 @@ class SessionManager(models.Manager):
     def __init__(self):
         super().__init__()
         # Session expiry in days
-        self.KEY_EXPIRE_IN_DAYS = 30
+        self.KEY_EXPIRE_IN_SECONDS = config.AUTH_COOKIE_AGE
         # Refresh the session before it expires during authentication
-        self.KEY_REFERSH_IN_DAYS = 14
+        self.KEY_REFERSH_IN_SECONDS = self.KEY_EXPIRE_IN_SECONDS // 2
 
     def create_session(self, user, request):
         """Primary use case: Create a session on signup/login
@@ -39,7 +40,7 @@ class SessionManager(models.Manager):
             key=hash_this(key),
             ip=getClientIP(request),
             ua=getUserAgent(request),
-            expire_at=now() + timedelta(days=self.KEY_EXPIRE_IN_DAYS)
+            expire_at=now() + timedelta(seconds=self.KEY_EXPIRE_IN_SECONDS)
         )
         return urlsafe_base64_encode(key.encode("ascii")), session
 
@@ -77,16 +78,14 @@ class SessionManager(models.Manager):
                 ua=ua,
                 is_valid=True
             )
-            if not session.is_valid:
-                return None
             if session.expire_at < now():
                 session.is_valid = False
                 session.updated_at = now()
                 session.save()
                 return None
-            elif session.expire_at + timedelta(days=self.KEY_REFERSH_IN_DAYS) < now():
+            elif session.expire_at + timedelta(seconds=self.KEY_REFERSH_IN_SECONDS) < now():
                 # If the session is about to expire, refresh it
-                session.expire_at = now() + timedelta(days=self.KEY_EXPIRE_IN_DAYS)
+                session.expire_at = now() + timedelta(seconds=self.KEY_EXPIRE_IN_SECONDS)
                 session.updated_at = now()
                 session.save()
             return session

@@ -8,14 +8,20 @@ _config = {
     "APP_NAME": get_if_present(settings.AXOR_AUTH, 'APP_NAME', 'Django Axor Auth'),
     "URI_PREFIX": get_if_present(settings.AXOR_AUTH, 'URI_PREFIX', '/api'),
     "FRONTEND_URL": get_if_present(settings.AXOR_AUTH, 'FRONTEND_URL', None),
+    "IS_REGISTRATION_ENABLED": get_if_present(settings.AXOR_AUTH, 'IS_REGISTRATION_ENABLED', True),
 
     # Cookies
     "AUTH_COOKIE_NAME": get_if_present(settings.AXOR_AUTH, 'AUTH_COOKIE_NAME', 'axor_auth'),
-    # 1 week
-    "AUTH_COOKIE_AGE": get_if_present(settings.AXOR_AUTH, 'AUTH_COOKIE_AGE', 60 * 60 * 24 * 7),
+    # 30 days
+    "AUTH_COOKIE_AGE": get_if_present(settings.AXOR_AUTH, 'AUTH_COOKIE_AGE', 60 * 60 * 24 * 30),
     "AUTH_COOKIE_SECURE": get_if_present(settings.AXOR_AUTH, 'AUTH_COOKIE_SECURE', False),
     "AUTH_COOKIE_SAMESITE": get_if_present(settings.AXOR_AUTH, 'AUTH_COOKIE_SAMESITE', 'SameSite'),
     "AUTH_COOKIE_DOMAIN": get_if_present(settings.AXOR_AUTH, 'AUTH_COOKIE_DOMAIN', None),
+
+    # Email Verification
+    # 30 mins
+    "EMAIL_VERIFICATION_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK_TIMEOUT', 30 * 60),
+    "EMAIL_VERIFICATION_LINK": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK', 'verify-email?token=<token>'),
 
     # Forgot Password
     # 30 mins
@@ -42,11 +48,14 @@ class Config:
     APP_NAME: str
     URI_PREFIX: str
     FRONTEND_URL: str
+    IS_REGISTRATION_ENABLED: bool
     AUTH_COOKIE_NAME: str
     AUTH_COOKIE_AGE: int
     AUTH_COOKIE_SECURE: bool
     AUTH_COOKIE_SAMESITE: str
     AUTH_COOKIE_DOMAIN: str
+    EMAIL_VERIFICATION_LINK_TIMEOUT: int
+    EMAIL_VERIFICATION_LINK: str
     FORGET_PASSWORD_LINK_TIMEOUT: int
     FORGET_PASSWORD_LOCKOUT_TIME: int
     TOTP_NUM_OF_BACKUP_CODES: int

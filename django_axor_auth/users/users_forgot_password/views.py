@@ -1,14 +1,13 @@
 from django.utils.encoding import force_str
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from ...utils.error_handling.error_message import ErrorMessage
-from ..serializers import PasswordSerializer
-from ..users_utils.emailing.api import send_forgot_password_email, send_password_changed_email
-from ..models import UserPasswordChange
+from django_axor_auth.utils.error_handling.error_message import ErrorMessage
+from django_axor_auth.users.serializers import PasswordSerializer
+from django_axor_auth.users.users_utils.emailing.api import send_forgot_password_email, send_password_changed_email
+from django_axor_auth.configurator import config
 from .models import ForgotPassword
 from .serializers import HealthyForgotPasswordSerializer
 from .utils import getClientIP
-from django_axor_auth.configurator import config
 
 
 @api_view(['POST'])
@@ -95,8 +94,6 @@ def reset_password(request):
             first_name=fp.user.first_name,
             subject='Password Changed'
         )
-        # Update Password Change table for user
-        UserPasswordChange.objects.save_due_forgot_password_form(fp.user)
         # Send empty success response
         return Response(status=204)
     else:
