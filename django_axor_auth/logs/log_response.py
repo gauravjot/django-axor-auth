@@ -1,10 +1,10 @@
 class LogResponse:
     def __init__(self, status, message=None):
-        self.status = status
+        self.status_code = status
         self.message = message
 
     def serialize(self):
-        result = {"s": self.status}
+        result = {"status_code": self.status_code}
         if self.message:
-            result["m"] = self.message
+            result["log_message"] = self.message
         return result

@@ -138,9 +138,9 @@ def login(request):
                 "last_session": last_session,
                 "last_token_session": last_token_session,
                 "user": UserSerializer(user).data,
-                "session": dict(
+                "app_token": dict(
                     id=app_token.id,
-                    key=jwt.encode(
+                    token=jwt.encode(
                         {
                             "app_token": token
                         },
@@ -148,9 +148,7 @@ def login(request):
                         algorithm='HS256'
                     ),
                 )
-            },
-                status=200
-            )
+            }, status=200)
     errors = serializer.errors
     err_msg = ErrorMessage(
         detail=errors,
@@ -160,6 +158,14 @@ def login(request):
         code='LoginSerializerErrors'
     )
     return err_msg.to_response()
+
+
+# Delete user
+# --------------------------------------------------------------------
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteUser(request):
+    pass
 
 
 @api_view(['POST'])
@@ -352,11 +358,18 @@ def changeEmail(request):
     ).to_response()
 
 
+# Verify email
+# --------------------------------------------------------------------
+@api_view(['POST'])
+def verifyEmail(request):
+    pass
+
+
 # Resend Verification Email if user is unverified
-# -----------------------------------------------
+# --------------------------------------------------------------------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def resendVerifyEmail(request):
+def resendVerificationEmail(request):
     user = get_request_user(request)
     if user.is_email_verified:
         return ErrorMessage(
@@ -396,6 +409,22 @@ def resendVerifyEmail(request):
         title='Email verification failed',
         code='EmailVerificationFailed'
     ).to_response()
+
+
+# Active user sessions, both session and token
+# --------------------------------------------------------------------
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def activeSessions(request):
+    pass
+
+
+# Close a session
+# --------------------------------------------------------------------
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def closeSession(request):
+    pass
 
 
 # --------------------------------------------------------------------

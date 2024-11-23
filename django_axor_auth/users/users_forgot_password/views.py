@@ -1,3 +1,6 @@
+import urllib
+from datetime import timedelta
+from django.utils.timezone import now
 from django.utils.encoding import force_str
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,6 +11,7 @@ from django_axor_auth.configurator import config
 from .models import ForgotPassword
 from .serializers import HealthyForgotPasswordSerializer
 from .utils import getClientIP
+from django_axor_auth.users.api import get_user
 
 
 @api_view(['POST'])
@@ -21,28 +25,36 @@ def forgot_password(request):
             instance=request.get_full_path(),
         )
         return err.to_response()
-    key, fp = ForgotPassword.objects.create_forgot_password(
-        request,
-        force_str(request.data['email'])
-    )
-    if key and fp:
-        # Send email with key
-        url = f'{config.FRONTEND_URL}/forgot-password/complete?token={key}'
+    email = force_str(request.data['email']).strip()
+    user = get_user(email)
+    # if user is not found, return
+    if not user:
+        return Response(status=204)
+    # if last request was made in lockout window, return
+    last_fp = ForgotPassword.filter(user=user).order_by('-created_at').first()
+    if last_fp and last_fp.created_at > now() - timedelta(seconds=config.FORGET_PASSWORD_LOCKOUT_TIME):
+        return Response(status=204)
+    # Create forgot password instance
+    token, fp = ForgotPassword.objects.create_forgot_password(request, user)
+    if token and fp:
+        # Send email with token
+        uri = config.FORGET_PASSWORD_LINK.replace('<token>', token)
+        url = urllib.parse.urljoin(config.FRONTEND_URL, uri)
         send_forgot_password_email(
-            email=force_str(fp.user.email),
+            email=fp.user.email,
             reset_url=url,
             first_name=fp.user.first_name,
             subject='Reset your password',
             ip=getClientIP(request),
         )
     # Send empty success response
-    return Response(status=200)
+    return Response(status=204)
 
 
 @api_view(['POST'])
 def check_health(request):
-    key = force_str(request.data['key'])
-    serializer = HealthyForgotPasswordSerializer(data={'key': key})
+    token = force_str(request.data['token'])
+    serializer = HealthyForgotPasswordSerializer(data={'token': token})
     if not serializer.is_valid():
         err = ErrorMessage(
             title='Invalid Request',
@@ -52,7 +64,7 @@ def check_health(request):
         )
         return err.to_response()
     # Send empty success response
-    return Response(status=200)
+    return Response(status=204)
 
 
 @api_view(['POST'])

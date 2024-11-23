@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 from .utils import generate_token, hash_this, getClientIP, getUserAgent
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django_axor_auth.configurator import config
 
 
 class AppTokenManager(models.Manager):
@@ -19,9 +20,9 @@ class AppTokenManager(models.Manager):
         Returns:
             tuple(key: str, token: Token)
         """
-        # Disable previous sessions from same IP and User-Agent
-        self.filter(user=user, ip=getClientIP(request),
-                    ua=getUserAgent(request), is_valid=True).update(is_valid=False)
+        # Disable previous sessions if required
+        if config.ALWAYS_DISABLE_PREVIOUS_SESSIONS:
+            self.filter(user=user, is_valid=True).update(is_valid=False)
         key = generate_token()
         token = self.create(
             user=user,

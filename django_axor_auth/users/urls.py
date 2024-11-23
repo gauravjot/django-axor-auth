@@ -25,7 +25,7 @@ urlpatterns = [
     path('change_email/', views.changeEmail),
 
     # Session management
-    path('active_sessions/', views.getUserSessions),
+    path('active_sessions/', views.activeSessions),
     path('active_session/close/', views.closeSession),
 
     # Addon modules

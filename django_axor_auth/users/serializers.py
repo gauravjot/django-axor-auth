@@ -32,11 +32,12 @@ def validate_password(value):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'is_active', 'created_at', 'first_name', 'last_name', 'timezone',
-                  'updated_at', 'email', 'password', 'created_by', 'updated_by']
+        fields = ['id', 'is_active', 'is_email_verified', 'created_at', 'first_name', 'last_name', 'timezone',
+                  'updated_at', 'email', 'password']
         extra_kwargs = {'password': {'write_only': True, 'required': True, 'validators': [validate_password]},
                         'created_at': {'read_only': True},
                         'email': {'required': True, 'validators': [validate_email]},
+                        'is_active': {'read_only': True},
                         'first_name': {'required': True},
                         'id': {'required': False},
                         'last_name': {'required': True}}

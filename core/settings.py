@@ -122,12 +122,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# DRF
-
-REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'utils.error_handling.drf_exception.drf_exception_handler',
-}
-
 # Security
 
 CORS_ALLOWED_ORIGINS = [config('FRONTEND_URL')]
@@ -184,14 +178,8 @@ def get_database():
 
 # If no database is provided, use sqlite3
 DATABASES = {
-    'logs_db': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': PROJECT_BASE_DIR / 'db' / 'logs.sqlite3',
-    },
     **get_database()
 }
-
-DATABASE_ROUTERS = ["core.database_router.DatabaseRouter"]
 
 # Email
 # https://docs.djangoproject.com/en/5.0/topics/email/

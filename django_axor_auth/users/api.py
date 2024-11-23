@@ -24,7 +24,7 @@ def get_user(email) -> Optional[User]:
         return None
 
 
-def get_request_user(request) -> User:
+def get_request_user(request) -> User | None:
     """Get the authenticated user from the request.
     This method should only be used if authentication decorator is used in the view to confirm that user is logged in.
 
@@ -41,7 +41,7 @@ def get_request_user(request) -> User:
             return session.user
     # if session-based auth is not used the it has to be app token
     app_token = get_active_token(request)
-    return app_token.user
+    return app_token.user if app_token is not None else None
 
 
 def add_user(email, password, first_name, last_name, created_by=None, serialized=False) -> User | Exception:

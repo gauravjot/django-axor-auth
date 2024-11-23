@@ -30,9 +30,9 @@ class SessionManager(models.Manager):
         Returns:
             tuple(key: str, session: Session)
         """
-        # Disable previous sessions from same IP and User-Agent
-        self.filter(user=user, ip=getClientIP(request),
-                    ua=getUserAgent(request), is_valid=True).update(is_valid=False)
+        # Disable previous sessions if required
+        if config.ALWAYS_DISABLE_PREVIOUS_SESSIONS:
+            self.filter(user=user, is_valid=True).update(is_valid=False)
         # Create a new session
         key = generate_session_key()
         session = self.create(

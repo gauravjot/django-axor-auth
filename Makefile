@@ -21,7 +21,6 @@ resetdb:
 	find . -type d -name migrations -prune -not -path "./.venv/*" -exec rm -rf {} \;
 	.venv/bin/python manage.py makemigrations $(apps)
 	.venv/bin/python manage.py migrate
-	.venv/bin/python manage.py migrate --database=logs_db
 
 superuser:
 	.venv/bin/python manage.py createsuperuser

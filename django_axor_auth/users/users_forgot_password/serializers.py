@@ -5,19 +5,17 @@ from .utils import hash_this
 
 
 class HealthyForgotPasswordSerializer(serializers.Serializer):
-    key = serializers.CharField()
+    token = serializers.CharField()
 
     def validate(self, data):
         err = 'Link or instance is no longer valid. Please request a new one.'
         # Check if key is provided
-        if 'key' not in data:
-            raise serializers.ValidationError(
-                'Key/token is not present.')
+        if 'token' not in data:
+            raise serializers.ValidationError('Token is not present.')
         try:
-            fp = ForgotPassword.objects.select_related('user').get(
-                key=hash_this(force_str(data['key'])))
+            fp = ForgotPassword.objects.select_related('user').get(token=hash_this(force_str(data['token'])))
             # Check if key is correct
-            if not fp.check_key(force_str(data['key'])):
+            if not fp.check_token(force_str(data['token'])):
                 raise serializers.ValidationError(err)
             # Check if fp is valid
             if not fp.check_valid():
