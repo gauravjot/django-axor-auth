@@ -4,7 +4,7 @@
 // Using anything else performs token based authentication.
 @x_requested_by = mobile
 
-@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJXRE5zYUV0clYwaGpjVjh6WHpFMFgzUkxlRU5GUzJkbWRVbFhUbGt6Y1c5NVpUbHRibEo1T0dWalNHSmhSVjk1WldaYWNGaFBNVzVwT1hsVE1FWjZNbEZNZGxKT00yVlZhWGxoYkU5b2RXOTZXVjlVY0ZFIn0.Bou6iUslTN9dBHb8J6bSQ6hPgRPje0RP7epY3_dFJN0
+@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJiVTlTUTBRek5uUXdNME14TVZwb2FUQnZObTFsVDIwMU5FOXZhM0JYWDNkclMxbzVVRFJoYmt4MFNtVkpNMGRJWDBoRVVVWlJXRVZOYldRd2NISlRlbkppZVhCVVZXcFpkM0pKVWxOSWNGTTFUR1YzYUdjIn0.NKqtRtLuC1NouoVjtmZN7ogOnBbeNTIe3ZRlD78toxk
 
 ### Register a new user
 POST http://{{host}}/api/user/register/

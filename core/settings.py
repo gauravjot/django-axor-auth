@@ -26,6 +26,7 @@ TOTP_BACKUP_CODE_LENGTH = 8  # keep it more than 6 to differentiate from TOTP co
 
 AXOR_AUTH = dict(
     APP_NAME=APP_NAME,
+    APP_LOGO='/static/axor/favicon.svg',
     AUTH_COOKIE_NAME='axor_auth',
     AUTH_COOKIE_AGE=60 * 60 * 24 * 7,  # 1 week
     AUTH_COOKIE_SECURE=config('AUTH_COOKIE_SECURE', default=False, cast=bool),

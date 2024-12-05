@@ -6,6 +6,7 @@ from .utils.extras import get_if_present
 _config = {
     # General
     "APP_NAME": get_if_present(settings.AXOR_AUTH, 'APP_NAME', 'Django Axor Auth'),
+    "APP_LOGO": get_if_present(settings.AXOR_AUTH, 'APP_LOGO', None),
     "URI_PREFIX": get_if_present(settings.AXOR_AUTH, 'URI_PREFIX', '/api'),
     "FRONTEND_URL": get_if_present(settings.AXOR_AUTH, 'FRONTEND_URL', None),
     "IS_REGISTRATION_ENABLED": get_if_present(settings.AXOR_AUTH, 'IS_REGISTRATION_ENABLED', True),
@@ -57,6 +58,7 @@ _config = {
 
 class Config:
     APP_NAME: str
+    APP_LOGO: str
     URI_PREFIX: str
     FRONTEND_URL: str
     IS_REGISTRATION_ENABLED: bool
