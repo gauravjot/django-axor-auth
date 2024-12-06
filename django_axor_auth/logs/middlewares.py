@@ -53,7 +53,7 @@ class APILogMiddleware:
             logs = ApiCallLog.objects.filter(
                 status_code=response.status_code).order_by('created_at')
             retention_period = now() - timedelta(seconds=config.LOG_4XX_MAX_AGE)
-            count = count
+            count = logs.count()
             if count > config.LOG_4XX_MAX_NUM:
                 # Delete the diff and 10% more for breathing space
                 num_to_delete = count - config.LOG_4XX_MAX_NUM

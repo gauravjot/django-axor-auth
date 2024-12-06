@@ -37,6 +37,23 @@ X-Requested-By: {{x_requested_by}}
   "code": 555923
 }
 
+### Request magic link
+POST http://{{host}}/api/user/magic_link/request/
+Content-Type: application/json
+
+{
+  "email": "john@test.com"
+}
+
+### Login with magic link
+POST http://{{host}}/api/user/magic_link/consume/
+Content-Type: application/json
+
+{
+  "token": "z3B0kmbVsTRFi8-ZooMib-nOA1hid7Z6irjTLqnF6IcFt_7iwQhpS3KdA3Zw1NyNH80fvKyPkxQL8OX1AZcnfA",
+  "code": 808592
+}
+
 ### Get user profile
 GET http://{{host}}/api/user/me/
 Authorization: {{auth_token}}

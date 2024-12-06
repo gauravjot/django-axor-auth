@@ -21,12 +21,16 @@ _config = {
     # Email Verification
     # 30 mins
     "EMAIL_VERIFICATION_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK_TIMEOUT', 30 * 60),
-    "EMAIL_VERIFICATION_LINK": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK', 'verify-email?token=<token>'),
+    "EMAIL_VERIFICATION_LINK": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK', 'process/verify-email/?token=<token>'),
 
     # Forgot Password
     "FORGET_PASSWORD_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LINK_TIMEOUT', 60 * 30),
     "FORGET_PASSWORD_LOCKOUT_TIME": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LOCKOUT_TIME', 60 * 30),
-    "FORGET_PASSWORD_LINK": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LINK', 'finish-forgot-password?token=<token>'),
+    "FORGET_PASSWORD_LINK": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LINK', 'process/forgot-password/?token=<token>'),
+
+    # Magic Link
+    "MAGIC_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'MAGIC_LINK_TIMEOUT', 60 * 60),
+    "MAGIC_LINK_URL": get_if_present(settings.AXOR_AUTH, 'MAGIC_LINK_URL', 'process/magic-link/?token=<token>'),
 
     # TOTP
     "TOTP_NUM_OF_BACKUP_CODES": get_if_present(settings.AXOR_AUTH, 'TOTP_NUM_OF_BACKUP_CODES', 8),
@@ -72,6 +76,8 @@ class Config:
     FORGET_PASSWORD_LINK_TIMEOUT: int
     FORGET_PASSWORD_LOCKOUT_TIME: int
     FORGET_PASSWORD_LINK: str
+    MAGIC_LINK_TIMEOUT: int
+    MAGIC_LINK_URL: str
     TOTP_NUM_OF_BACKUP_CODES: int
     TOTP_BACKUP_CODE_LENGTH: int
     SMTP_USE_TLS: bool

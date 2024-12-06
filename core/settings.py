@@ -26,7 +26,7 @@ TOTP_BACKUP_CODE_LENGTH = 8  # keep it more than 6 to differentiate from TOTP co
 
 AXOR_AUTH = dict(
     APP_NAME=APP_NAME,
-    APP_LOGO='/static/axor/favicon.svg',
+    APP_LOGO='/static/axor/full_logo.svg',
     AUTH_COOKIE_NAME='axor_auth',
     AUTH_COOKIE_AGE=60 * 60 * 24 * 7,  # 1 week
     AUTH_COOKIE_SECURE=config('AUTH_COOKIE_SECURE', default=False, cast=bool),
@@ -46,6 +46,13 @@ AXOR_AUTH = dict(
     FRONTEND_URL=config('FRONTEND_URL', default=None),
 )
 
+
+# Email
+# https://docs.djangoproject.com/en/5.0/topics/email/
+
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # ----- Django Settings
 #
@@ -181,11 +188,6 @@ def get_database():
 DATABASES = {
     **get_database()
 }
-
-# Email
-# https://docs.djangoproject.com/en/5.0/topics/email/
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 
 def getEmailConnection():

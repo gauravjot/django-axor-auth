@@ -70,6 +70,8 @@ def register(request):
     return err_msg.to_response()
 
 
+# Login user
+# --------------------------------------------------------------------
 @api_view(['POST'])
 def login(request):
     # Validate request data
@@ -77,78 +79,8 @@ def login(request):
     if serializer.is_valid():
         # Get user
         user = serializer.validated_data
-        # Check if user hash TOTP enabled
-        totp_row = has_totp(user)
-        if totp_row is not None:
-            # If totp code is not provided
-            if 'code' not in request.data or ('code' in request.data and (request.data['code'] == None or request.data['code'] == '')):
-                return ErrorMessage(
-                    detail="TOTP code is required.",
-                    status=401,
-                    instance=request.build_absolute_uri(),
-                    title='2FA code is required',
-                    code='TOTPRequired'
-                ).to_response()
-            # Authenticate TOTP
-            if not authenticate_totp(user, force_str(request.data['code']), totp_row):
-                return ErrorMessage(
-                    detail="Provided TOTP code or backup code is incorrect. Please try again.",
-                    status=401,
-                    instance=request.build_absolute_uri(),
-                    title='2FA code is incorrect',
-                    code='TOTPIncorrect'
-                ).to_response()
-        # Get last session details
-        last_session = get_last_session_details(user)  # already serialized
-        last_token_session = get_last_token_session_details(
-            user)  # already serialized
-        # Respond depending on the client
-        if is_web(request):
-            # Session based authentication
-            key, session = create_session(user, request)
-            # Add HTTPOnly cookie
-            response = Response(data={
-                "last_session": last_session,
-                "last_token_session": last_token_session,
-                "user": UserSerializer(user).data
-            },
-                status=200
-            )
-            response.set_cookie(
-                key=config.AUTH_COOKIE_NAME,
-                value=jwt.encode(
-                    {
-                        "session_key": key
-                    },
-                    settings.SECRET_KEY,
-                    algorithm='HS256'
-                ),
-                expires=session.expire_at,
-                httponly=True,
-                secure=config.AUTH_COOKIE_SECURE,
-                samesite=config.AUTH_COOKIE_SAMESITE,
-                domain=config.AUTH_COOKIE_DOMAIN
-            )
-            return response
-        else:
-            # Token based authentication
-            token, app_token = create_app_token(user, request)
-            # Respond with token and user data
-            return Response(data={
-                "last_session": last_session,
-                "last_token_session": last_token_session,
-                "user": UserSerializer(user).data,
-                "app_token": dict(
-                    id=app_token.id,
-                    token=jwt.encode(
-                        {
-                            "app_token": token
-                        },
-                        settings.SECRET_KEY,
-                        algorithm='HS256'
-                    ),
-                )
-            }, status=200)
+        # Login user
+        return _finish_login(request, user)
     errors = serializer.errors
     err_msg = ErrorMessage(
         detail=errors,
@@ -158,6 +90,86 @@ def login(request):
         code='LoginSerializerErrors'
     )
     return err_msg.to_response()
+
+
+def magic_link_login(request, user):
+    # Login user
+    return _finish_login(request, user)
+
+
+def _finish_login(request, user):
+    # Check if user hash TOTP enabled
+    totp_row = has_totp(user)
+    if totp_row is not None:
+        # If totp code is not provided
+        if 'code' not in request.data or ('code' in request.data and (request.data['code'] == None or request.data['code'] == '')):
+            return ErrorMessage(
+                detail="TOTP code is required.",
+                status=401,
+                instance=request.build_absolute_uri(),
+                title='2FA code is required',
+                code='TOTPRequired'
+            ).to_response()
+        # Authenticate TOTP
+        if not authenticate_totp(user, force_str(request.data['code']), totp_row):
+            return ErrorMessage(
+                detail="Provided TOTP code or backup code is incorrect. Please try again.",
+                status=401,
+                instance=request.build_absolute_uri(),
+                title='2FA code is incorrect',
+                code='TOTPIncorrect'
+            ).to_response()
+    # Get last session details
+    last_session = get_last_session_details(user)  # already serialized
+    last_token_session = get_last_token_session_details(
+        user)  # already serialized
+    # Respond depending on the client
+    if is_web(request):
+        # Session based authentication
+        key, session = create_session(user, request)
+        # Add HTTPOnly cookie
+        response = Response(data={
+            "last_session": last_session,
+            "last_token_session": last_token_session,
+            "user": UserSerializer(user).data
+        },
+            status=200
+        )
+        response.set_cookie(
+            key=config.AUTH_COOKIE_NAME,
+            value=jwt.encode(
+                {
+                    "session_key": key
+                },
+                settings.SECRET_KEY,
+                algorithm='HS256'
+            ),
+            expires=session.expire_at,
+            httponly=True,
+            secure=config.AUTH_COOKIE_SECURE,
+            samesite=config.AUTH_COOKIE_SAMESITE,
+            domain=config.AUTH_COOKIE_DOMAIN
+        )
+        return response
+    else:
+        # Token based authentication
+        token, app_token = create_app_token(user, request)
+        # Respond with token and user data
+        return Response(data={
+            "last_session": last_session,
+            "last_token_session": last_token_session,
+            "user": UserSerializer(user).data,
+            "app_token": dict(
+                id=app_token.id,
+                token=jwt.encode(
+                    {
+                        "app_token": token
+                    },
+                    settings.SECRET_KEY,
+                    algorithm='HS256'
+                ),
+            )
+        }, status=200)
 
 
 # Delete user

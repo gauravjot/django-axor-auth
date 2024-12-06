@@ -52,3 +52,15 @@ def forgot_password(request):
 
 def logout(request):
     return render(request, 'login.html')
+
+
+def process_forgot_password(request):
+    return render(request, 'login.html')
+
+
+def process_magic_link(request):
+    return render(request, 'login.html')
+
+
+def process_verify_email(request):
+    return render(request, 'login.html')

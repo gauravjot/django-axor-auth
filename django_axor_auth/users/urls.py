@@ -32,4 +32,6 @@ urlpatterns = [
     path('totp/', include('django_axor_auth.users.users_totp.urls')),
     path('forgot_password/',
          include('django_axor_auth.users.users_forgot_password.urls')),
+    path('magic_link/',
+         include('django_axor_auth.users.users_magic_link.urls')),
 ]

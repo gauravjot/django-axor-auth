@@ -4,6 +4,7 @@ from django_axor_auth.users.users_utils.emailing.templates.email_changed import 
 from .templates.new_user_account import new_user_account_template
 from .templates.forgot_password import forgot_password_template
 from .templates.reset_password_success import reset_password_success_template
+from .templates.magic_link import magic_link_template
 from django_axor_auth.utils.emailing.helper import getEmailConnection
 from django_axor_auth.configurator import config
 
@@ -101,6 +102,32 @@ def send_email_changed_email(first_name: str, verification_url: str, email: str,
     try:
         with getEmailConnection() as connection:
             message = f"Hello {first_name},\n\nPlease verify your new email by clicking the link below.\n\n{verification_url}"
+            return send_mail(subject=subject,
+                             message=message,
+                             html_message=template,
+                             from_email=config.SMTP_DEFAULT_SEND_FROM,
+                             recipient_list=[email,],
+                             connection=connection)
+    except Exception as e:
+        return 0
+
+
+def send_magic_link_email(first_name: str, url: str, email: str, subject='Sign in with Magic Link'):
+    """Send a welcome email to a new user
+
+    Args:
+        `first_name` (str): Users first name
+        `verification_key` (str): Verification token
+        `email` (str): Recipient email address.
+        `subject` (str, optional): Email subject.
+
+    Returns:
+        `int`: Returns 0 if fails.
+    """
+    template = magic_link_template(first_name, url, subject)
+    try:
+        with getEmailConnection() as connection:
+            message = f"Hello {first_name},\n\nYour magic link is ready!\n\n{url}"
             return send_mail(subject=subject,
                              message=message,
                              html_message=template,
