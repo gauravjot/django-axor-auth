@@ -92,4 +92,3 @@ def consume_magic_link(request):
             code='InvalidToken'
         )
         return err.to_response()
-    pass

@@ -25,7 +25,7 @@ from .serializers import EmailSerializer, PasswordSerializer, UserSerializer, Lo
 from .permissions import IsAuthenticated
 from .api import consume_active_email_verifications, email_exists, get_request_user, latest_unused_email_verification
 # Email
-from .users_utils.emailing.api import send_email_changed_email, send_password_changed_email
+from .users_utils.emailing.api import send_email_changed_email, send_password_changed_email, send_welcome_email, send_verification_email as send_general_verification_email
 
 
 @api_view(['POST'])
@@ -44,7 +44,7 @@ def register(request):
     if serializer.is_valid():
         # Send email verification
         user = serializer.validated_data
-        send_verification_email(user)
+        send_verification_email(user, is_new_account=True)
         # login user
         try:
             return login(request._request)
@@ -358,7 +358,7 @@ def changeEmail(request):
     user.save()
 
     # Generate and send new email verification token
-    sent = send_verification_email(user)
+    sent = send_verification_email(user, is_email_changed=True)
     if sent:
         return Response(data=UserSerializer(user).data, status=200)
     return ErrorMessage(
@@ -398,7 +398,8 @@ def resendVerificationEmail(request):
         time_to_wait = (latest_email_sent.created_at + timedelta(
             seconds=config.EMAIL_VERIFICATION_LINK_TIMEOUT) - now()).seconds // 60
         return ErrorMessage(
-            detail=f'Email verification link was sent recently. Please wait {time_to_wait} minutes before requesting another link.',
+            detail=f'Email verification link was sent recently. Please wait {
+                time_to_wait} minutes before requesting another link.',
             status=400,
             instance=request.build_absolute_uri(),
             title='Email verification link sent recently',
@@ -441,7 +442,7 @@ def closeSession(request):
 
 # --------------------------------------------------------------------
 
-def send_verification_email(user) -> bool:
+def send_verification_email(user, is_new_account=False, is_email_changed=False) -> bool:
     # Generate and send email verification token
     verifyToken = token_urlsafe(42)
     verifySerializer = VerifyEmailSerializer(data=dict(
@@ -457,6 +458,11 @@ def send_verification_email(user) -> bool:
         # Send email
         uri = config.EMAIL_VERIFICATION_LINK.replace("<token>", verifyToken)
         verification_url = urllib.parse.urljoin(config.FRONTEND_URL, uri)
-        send_email_changed_email(user.first_name, verification_url, user.email)
+        if is_new_account:
+            send_welcome_email(user.first_name, verification_url, user.email)
+        elif is_email_changed:
+            send_email_changed_email(user.first_name, verification_url, user.email)
+        else:
+            send_general_verification_email(user.first_name, verification_url, user.email)
         return True
     return False

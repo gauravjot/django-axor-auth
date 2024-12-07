@@ -2,7 +2,7 @@ from django_axor_auth.utils.emailing.base_template import base_template
 from django_axor_auth.configurator import config
 
 
-def new_user_account_template(first_name, url, email_subject='Welcome to ' + config.APP_NAME):
+def new_user_account_template(first_name, url, email_subject='Welcome'):
     return base_template(
         subject=email_subject,
         headline="Let's get you upto speed!",

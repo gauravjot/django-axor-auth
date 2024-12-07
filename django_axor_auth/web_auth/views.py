@@ -1,20 +1,22 @@
+from django.http import HttpRequest
 from django.shortcuts import render
 from django.utils.encoding import force_str
-from .forms import LoginForm
+from .forms import LoginForm, ProcessMagicLinkForm
 from django_axor_auth.users.views import login, me
-from django_axor_auth.users.users_magic_link.views import request_magic_link
+from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
 import json
 from django_axor_auth.configurator import config
 
+app_info = dict(
+    app_name=config.APP_NAME,
+    app_logo=config.APP_LOGO
+)
 
+
+# Login Page
+# -----------------------------------------------------------------------------
 def login_page(request):
     template = 'login.html'
-    app_logo = config.APP_LOGO
-    app_name = config.APP_NAME
-    app_info = dict(
-        app_name=app_name,
-        app_logo=app_logo
-    )
     # Set the request source
     request.requested_by = 'web'
     # Check if there is a login request
@@ -42,7 +44,7 @@ def login_page(request):
             # Passwordless login
             email = force_str(form.data.get('email'))
             request.data = {'email': email}
-            api_res = request_magic_link(request)
+            request_magic_link(request)
             return render(request, template, {'app': app_info, 'success': True, 'passwordless': True})
         return render(request, template, {'app': app_info, 'error': 'Please enter email and password.', 'form': form, 'passwordless': is_passwordless})
     else:
@@ -73,8 +75,41 @@ def process_forgot_password(request):
     return render(request, 'login.html')
 
 
+# Magic Link or Passwordless Login
+# This is the URL that is sent to the user's email
+# -----------------------------------------------------------------------------
 def process_magic_link(request):
-    return render(request, 'login.html')
+    template = 'process_magic_link.html'
+    # Set the request source
+    request.requested_by = 'web'
+    # Sanitize the token
+    token = request.GET.get('token')
+    # Check if user is already logged in
+    if request.method == "GET":
+        user = me(request)
+        if user.status_code < 400:
+            print('User is already logged in')
+            return render(request, template, {'app': app_info, 'success': True})
+    if token:
+        form = ProcessMagicLinkForm(initial={'token': token})
+        if request.method == "POST":
+            api_res = consume_magic_link(request)
+            if api_res.status_code >= 400:
+                error = json.loads(api_res.content).get('title')
+                error_code = json.loads(api_res.content).get('code')
+                # Check if the error is due to TOTP requirement
+                if api_res.status_code == 401 and 'TOTP' in error_code:
+                    return render(request, template, {'app': app_info, 'totp': True, 'form': form})
+                # Give user the error message
+                return render(request, template, {'app': app_info, 'error': error, 'form': None})
+            else:
+                # User is logged in
+                response = render(request, template, {'app': app_info, 'success': True})
+                response.cookies = api_res.cookies
+                return response
+        return render(request, template, {'app': app_info, 'form': form, 'load': True})
+    else:
+        return render(request, template, {'app': app_info, 'error': 'Token is required.'})
 
 
 def process_verify_email(request):
