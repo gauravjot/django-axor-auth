@@ -20,7 +20,7 @@
             <p class="text-md">{{ error }}</p>
           </div>
         {% endif %}
-        <form method="post" class="space-y-3 login-form">
+        <form method="post" class="my-8 space-y-3 login-form">
           {% csrf_token %}
           {% if totp %}
             <div class="bg-warning bg-opacity-10 p-3.5 rounded-2 text-gray-900">
@@ -65,11 +65,11 @@
         <div class="my-5 text-xs text-center text-gray-400">OR CONTINUE WITH</div>
         {% if passwordless %}
           <div>
-            <a class="w-full btn" href="?method=">Sign In Using Password</a>
+            <a class="w-full text-gray-600 btn" href="?method=">Sign In Using Password</a>
           </div>
         {% else %}
           <div>
-            <a class="w-full btn" href="?method=passwordless">Request Magic Link</a>
+            <a class="w-full text-gray-600 btn" href="?method=passwordless">Request Magic Link</a>
           </div>
         {% endif %}
         <div class="mt-6 text-xs text-center text-gray-500">
