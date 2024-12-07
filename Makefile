@@ -1,6 +1,6 @@
 # Only to be used in development environment
 
-apps := users users_sessions users_totp logs users_forgot_password users_app_tokens uses_magic_link
+apps := users users_sessions users_totp logs users_forgot_password users_app_tokens users_magic_link
 
 .PHONY: build publish venv resetdb superuser getready run docs su
 

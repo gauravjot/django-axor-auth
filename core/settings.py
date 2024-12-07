@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     'django_axor_auth.users.users_totp',
     'django_axor_auth.users.users_forgot_password',
     'django_axor_auth.users.users_app_tokens',
+    'django_axor_auth.users.users_magic_link',
 ]
 
 MIDDLEWARE = [
