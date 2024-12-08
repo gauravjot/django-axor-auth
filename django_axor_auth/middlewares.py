@@ -1,4 +1,4 @@
-from .configurator import config
+from django_axor_auth.configurator import config
 
 
 class HeaderRequestedByMiddleware:

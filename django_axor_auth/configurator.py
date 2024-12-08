@@ -1,7 +1,8 @@
-from django.conf import settings
 from typing import Any
-from .utils.extras import get_if_present
 
+from django.conf import settings
+
+from .utils.extras import get_if_present
 
 _config = {
     # General
@@ -21,16 +22,20 @@ _config = {
     # Email Verification
     # 30 mins
     "EMAIL_VERIFICATION_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK_TIMEOUT', 30 * 60),
-    "EMAIL_VERIFICATION_LINK": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK', 'auth/verify-email/process/?token=<token>'),
+    "EMAIL_VERIFICATION_LINK": get_if_present(settings.AXOR_AUTH, 'EMAIL_VERIFICATION_LINK',
+                                              'auth/verify-email/process/?token=<token>'),
 
     # Forgot Password
     "FORGET_PASSWORD_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LINK_TIMEOUT', 60 * 30),
     "FORGET_PASSWORD_LOCKOUT_TIME": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LOCKOUT_TIME', 60 * 30),
-    "FORGET_PASSWORD_LINK": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LINK', 'auth/forgot-password/process/?token=<token>'),
+    "FORGET_PASSWORD_LINK": get_if_present(settings.AXOR_AUTH, 'FORGET_PASSWORD_LINK',
+                                           'auth/forgot-password/process/?token=<token>'),
 
     # Magic Link
     "MAGIC_LINK_TIMEOUT": get_if_present(settings.AXOR_AUTH, 'MAGIC_LINK_TIMEOUT', 60 * 60),
     "MAGIC_LINK_URL": get_if_present(settings.AXOR_AUTH, 'MAGIC_LINK_URL', 'auth/magic-link/process/?token=<token>'),
+    "MAGIC_LINK_REDIRECT_URL": get_if_present(settings.AXOR_AUTH, 'MAGIC_LINK_REDIRECT_URL',
+                                              get_if_present(settings.AXOR_AUTH, 'FRONTEND_URL', None)),
 
     # TOTP
     "TOTP_NUM_OF_BACKUP_CODES": get_if_present(settings.AXOR_AUTH, 'TOTP_NUM_OF_BACKUP_CODES', 8),

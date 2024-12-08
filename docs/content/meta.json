@@ -1,6 +1,0 @@
-{
-	"order": ["installation.md", "setup.md", "session_vs_app_token"],
-	"alias": {
-		"session_vs_app_token": "Authentication Types"
-	}
-}
