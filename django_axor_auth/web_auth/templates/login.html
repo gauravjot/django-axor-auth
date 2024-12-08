@@ -8,7 +8,7 @@
     <div class="p-8 mx-4 space-y-3 shadow-lg bg-background rounded-4 w-100" style="max-width:30rem">
       {% if app.app_logo %}
         <div class="mb-5 text-center">
-          <img src="{{ app.app_logo }}" alt="Axor Logo" style="height:3.25rem" />
+          <img src="{{ app.app_logo }}" alt="{{ app.app_info }} Logo" style="height:3.25rem" />
         </div>
       {% endif %}
       {% if success is None or success is False %}
@@ -81,7 +81,7 @@
           <h1 class="text-3xl font-bold tracking-tight text-center text-black">You are logged in!</h1>
           <p class="font-medium leading-normal text-center text-gray-500 text-md">Please wait while you are being redirected to home.</p>
         {% elif success and passwordless %}
-          <h1 class="flex justify-center gap-2 text-3xl font-bold tracking-tight text-center text-black place-items-center">
+          <div class="flex justify-center gap-2 text-3xl font-bold tracking-tight text-center text-black place-items-center">
             <div class="leading-none text-warning">
               <svg xmlns="http://www.w3.org/2000/svg"
                    width="28"
@@ -91,8 +91,7 @@
                    stroke="currentColor"
                    stroke-width="2"
                    stroke-linecap="round"
-                   stroke-linejoin="round"
-                   class="lucide lucide-sparkles">
+                   stroke-linejoin="round">
                 <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                 <path d="M20 3v4" />
                 <path d="M22 5h-4" />
@@ -101,7 +100,7 @@
               </svg>
             </div>
             <span>Magic Link Sent!</span>
-          </h1>
+          </div>
           <p class="font-medium leading-normal text-center text-gray-500 text-md">
             Please check your inbox for our email. If it is not there, then check your spam or junk folder.
           </p>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Signing out...
+{% endblock title %}
+{% block content %}
+    <div class="flex justify-center h-screen w-100 place-items-center bg-gradient">
+        <div class="p-8 mx-4 space-y-3 shadow-lg bg-background rounded-4 w-100" style="max-width:30rem">
+            {% if app.app_logo %}
+                <div class="mb-5 text-center">
+                    <img src="{{ app.app_logo }}" alt="{{ app.app_info }} Logo" style="height:3.25rem"/>
+                </div>
+            {% endif %}
+            {% if success %}
+                <h1 class="text-3xl font-bold tracking-tight text-center text-black">Successfully Logged Out</h1>
+                <p class="mb-5 font-medium text-center text-gray-500 text-md">Redirecting in few seconds...</p>
+            {% elif error %}
+                <h1 class="text-3xl font-bold tracking-tight text-center text-black">Error Logging Out :(</h1>
+                <p class="mb-5 font-medium text-center text-gray-500 text-md">{{ error }}</p>
+            {% else %}
+                <h1 class="text-3xl font-bold tracking-tight text-center text-black">Logging out...</h1>
+                <p class="mb-5 font-medium text-center text-gray-500 text-md">Please wait.</p>
+                <form id="logout-form" method="post">
+                    {% csrf_token %}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        // Automatically submit the form when the page loads
+        window.onload = function () {
+            const form = document.getElementById('logout-form');
+            if (form) {
+                form.submit();
+            }
+        };
+    </script>
+{% endblock content %}

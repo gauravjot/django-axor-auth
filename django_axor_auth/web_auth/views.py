@@ -1,11 +1,12 @@
-from django.http import HttpRequest
+import json
+
 from django.shortcuts import render
 from django.utils.encoding import force_str
-from .forms import LoginForm, ProcessMagicLinkForm
-from django_axor_auth.users.views import login, me
-from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
-import json
+
 from django_axor_auth.configurator import config
+from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
+from django_axor_auth.users.views import login, me, logout
+from .forms import LoginForm, ProcessMagicLinkForm
 
 app_info = dict(
     app_name=config.APP_NAME,
@@ -46,12 +47,12 @@ def login_page(request):
             request.data = {'email': email}
             request_magic_link(request)
             return render(request, template, {'app': app_info, 'success': True, 'passwordless': True})
-        return render(request, template, {'app': app_info, 'error': 'Please enter email and password.', 'form': form, 'passwordless': is_passwordless})
+        return render(request, template, {'app': app_info, 'error': 'Please enter email and password.', 'form': form,
+                                          'passwordless': is_passwordless})
     else:
         # Check if user is already logged in
         user = me(request)
         if user.status_code < 400:
-            print('User is already logged in')
             return render(request, template, {'app': app_info, 'success': True})
         else:
             # User is not logged in
@@ -63,11 +64,22 @@ def login_page(request):
             return render(request, template, {'app': app_info, 'form': form})
 
 
+# Logout
+# -----------------------------------------------------------------------------
+def logout_page(request):
+    template = 'logout.html'
+    if request.method == "POST":
+        request.requested_by = 'web'
+        api_res = logout(request)
+        if api_res.status_code >= 400:
+            return render(request, template,
+                          {'app': app_info, 'error': 'There was an error logging out. Please try again.'})
+        else:
+            return render(request, template, {'app': app_info, 'success': True})
+    return render(request, template, {'app': app_info})
+
+
 def forgot_password(request):
-    return render(request, 'login.html')
-
-
-def logout(request):
     return render(request, 'login.html')
 
 
