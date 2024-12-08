@@ -1,0 +1,102 @@
+---
+interface Props {
+  toc: string;
+}
+
+const { toc }: Props = Astro.props;
+---
+
+<div
+  id="toc-sidebar"
+  class="order-1 flex-1 md:flex-initial xl:sticky xl:top-16 xl:order-3 xl:max-h-[calc(100vh-4rem)] xl:overflow-auto"
+>
+  <div class="mt-8 border rounded-md xl:border-none dark:border-zinc-900">
+    <div
+      class="text-sm font-medium toc-toggle-btn text-zinc-700 dark:text-zinc-300"
+      id="toc-toggle-btn"
+    >
+      TABLE OF CONTENTS
+    </div>
+    <div id="toc-container" class="px-4 xl:p-0" data-hidden="false" set:html={toc}></div>
+  </div>
+</div>
+
+<script>
+
+  const toc_toggle_btn = document.getElementById("toc-toggle-btn");
+  toc_toggle_btn?.addEventListener("click", toggleToc);
+
+  // Hide TOC on small screens
+  if (window.matchMedia("only screen and (max-width: 1279px)").matches) {
+    hideToc();
+  }
+
+  // Listen for window resize
+  window.addEventListener("resize", () => {
+    if (window.matchMedia("only screen and (max-width: 1279px)").matches) {
+      hideToc();
+    } else {
+      showToc();
+    }
+  });
+
+  // Toggle TOC
+  function toggleToc() {
+    if (window.matchMedia("only screen and (min-width: 1536px)").matches) {
+      return; // dont hide
+    }
+    let toc = document.getElementById("toc-container");
+    if (!toc) return;
+    if (toc.dataset.hidden === "true") {
+      showToc();
+    } else {
+      hideToc();
+    }
+    toc_toggle_btn?.classList.toggle("rotate-arr");
+  }
+
+  function showToc() {
+    let toc = document.getElementById("toc-container");
+    if (!toc) return;
+    toc.dataset.hidden = "false";
+  }
+  function hideToc() {
+    let toc = document.getElementById("toc-container");
+    if (!toc) return;
+    toc.dataset.hidden = "true";
+  }
+
+  // Intersection observer for toc highlighting
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const id = entry.target.getAttribute("id");
+        if (entry.intersectionRatio > 0) {
+          console.log(id);
+          // disable all current toc links
+          document
+            .querySelectorAll("#toc a")
+            .forEach((el) => el.setAttribute("aria-current", "false"));
+          // enable current toc link
+          document
+            .querySelector(`#toc a[href="#${id}"]`)
+            ?.setAttribute("aria-current", "true");
+        }
+      });
+    },
+    { rootMargin: "0% 0% -70% 0%" }
+  );
+  let current_uri: string | null = null;
+
+  window.addEventListener('scroll', function () {
+    if (current_uri !== window.location.href) {
+      current_uri = window.location.href;
+      console.log('uri changed');
+      const mdContent = document.getElementById("md-content");
+      mdContent?.querySelectorAll("h2, h3, h4").forEach((heading) => {
+        observer.observe(heading);
+      });
+    }
+  });
+</script>

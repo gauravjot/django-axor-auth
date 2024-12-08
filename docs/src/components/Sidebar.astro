@@ -1,0 +1,137 @@
+---
+import { SIDEBAR } from "../config/sidebar";
+import { generateSidebarList } from "../utils/generate_sidebar";
+
+interface Props {
+  version: string;
+  docs: any;
+  highlight: string;
+}
+
+const {version, docs, highlight} = Astro.props;
+
+---
+
+<!-- Sidebar starts -->
+<div
+	id="sidebar"
+	data-hidden="false"
+	class="fixed bottom-0 top-14 z-40 mt-px flex max-h-[calc(100svh-3.5rem)] flex-col overflow-hidden"
+>
+	<div class="relative h-[calc(100%-2.27rem)] flex-1 overflow-y-auto">
+		<!-- Sidebar menu starts -->
+		{() => {if (SIDEBAR.permalinks.main.links.length > 0) {
+      return <>
+        <div class="mt-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">LINKS</div>
+        <ul id="sidebar-nav-list" class="my-4">
+          {/* Main links */}
+          {SIDEBAR.permalinks.main.links.map((link) => (
+            <li class="group">
+              <a
+                href={link.href}
+                class="flex items-center justify-between px-4 py-2 text-sm font-medium text-zinc-500 dark:text-zinc-400 rounded-md group-hover:bg-black/10 dark:group-hover:bg-zinc-800"
+                target={link.open_in_new ? '_blank' : '_self'}
+                rel={link.open_in_new ? 'noopener noreferrer' : ''}
+              >
+                {link.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+		}}}
+		<!-- DO NOT EDIT 5 lINES BELOW-->
+		<div class="mt-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">DOCS</div>
+		<!-- Doc list for navigation -->
+		<div id="sidebar-doc-list" class="my-4"><div set:html={generateSidebarList(version, docs as any, highlight)}></div></div>
+
+		<!-- Sidebar menu ends -->
+	</div>
+	<!-- Sidebar footer starts -->
+	<div class="flex border-t text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+		<div class="foot-links flex h-14 flex-1 place-items-center gap-3">
+      {/* Sidebar footer links */}
+      {() => {if (SIDEBAR.permalinks.foot.links.length > 0) {
+        return SIDEBAR.permalinks.foot.links.map((link) => (
+          <a
+            href={link.href}
+            class="hover:text-black dark:hover:text-zinc-500"
+            target={link.open_in_new ? '_blank' : '_self'}
+            rel={link.open_in_new ? 'noopener noreferrer' : ''}
+          >
+            {link.title}
+          </a>
+        ))
+      }}}
+		</div>
+
+		<!-- NO NEED TO CHANGE ANYTHING BELOW -->
+
+		<!-- Sidebar toggle button (appears when sidebar open) -->
+		<div>
+			<button
+        id="sidebar-toggle"
+				title="Toggle Sidebar"
+				class="flex size-10 place-items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-zinc-800"
+			>
+				<span class="ic-sidebar"></span>
+			</button>
+		</div>
+		<!-- Siedbar toggle button ends -->
+	</div>
+	<!-- Sidebar toggle button (appears when sidebar closed) -->
+	<div>
+		<button
+      id="sidebar-toggle-closed"
+			title="Toggle Sidebar"
+			class="flex size-10 place-items-center justify-center rounded-md hover:bg-black/10 dark:hover:bg-zinc-800"
+		>
+			<span class="ic-sidebar"></span>
+		</button>
+	</div>
+	<!-- Siedbar toggle button ends -->
+	<!-- Sidebar footer ends -->
+</div>
+<!-- Sidebar ends -->
+
+<div class="ml-16 hidden"></div>
+
+<script>
+  // Expand accordion for open page
+  const sbDocList = document.getElementById("sidebar-doc-list")?.getElementsByTagName("a");
+  if (sbDocList) {
+    for (let i = 0; i < sbDocList.length; i++) {
+      if (sbDocList[i].getAttribute("aria-current") === "true") {
+        let parent = sbDocList[i].parentElement;
+        while (parent?.id !== "sidebar-doc-list") {
+          // if tagName is button, then it is an accordion
+          if (parent?.tagName.toUpperCase() === "LI" && parent.classList.contains("accordion")) {
+            parent.setAttribute("aria-expanded", "true");
+          }
+          parent = parent?.parentElement || null;
+        }
+        break;
+      }
+    }
+  }
+  // Sidebar accordions on click listeners
+  const sbAccordions = document.getElementsByClassName("accordion");
+  for (let i = 0; i < sbAccordions.length; i++) {
+    // Get first element of the accordion
+    const btn = sbAccordions[i].getElementsByTagName("button")[0];
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      let parent = (e.target as HTMLElement).parentElement;
+      while (!parent?.classList.contains("accordion")) {
+        parent = parent?.parentElement || null;
+        if (parent?.id === "sidebar-doc-list") {
+          break;
+        }
+      }
+      parent.setAttribute(
+        "aria-expanded",
+        parent.getAttribute("aria-expanded") === "true" ? "false" : "true",
+      );
+    });
+  }
+</script>

@@ -1,0 +1,128 @@
+---
+import {META} from '../config/app.js';
+import {versions} from '../content/config.js';
+
+interface Props {
+  version: string;
+};
+
+const {version} = Astro.props;
+
+const nav_logo = META.navbar.logo;
+
+---
+
+<!-- Navigation starts -->
+<nav
+	id="navbar"
+	class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-zinc-200 dark:border-zinc-800 dark:bg-black"
+>
+	<div class="container flex h-16 gap-2 mx-auto place-items-center sm:gap-4">
+		<div class="flex flex-1 gap-2 leading-4 place-items-center">
+			<!-- Sidebar toggle button (appears when sidebar closed) -->
+			<div id="nav-sidebar-toggle">
+				<button
+					id="sidebar-toggler"
+					title="Toggle Sidebar"
+					class="flex justify-center rounded-md size-10 place-items-center hover:bg-black/10 dark:hover:bg-zinc-800"
+				>
+					<span class="ic-hamburger"></span>
+				</button>
+			</div>
+			<!-- Sidebar toggle button ends -->
+			<a
+				href="/"
+				class="flex gap-2 text-lg font-bold text-black truncate place-items-center text-ellipsis hover:no-underline sm:text-2xl dark:text-white"
+			>
+        {() => {if (nav_logo.style === 'icon_with_text') {
+          const icon = nav_logo.variations.icon_with_text.icon;
+          const text = nav_logo.variations.icon_with_text.text;
+          return <img src={icon} alt="" class="size-6 lg:size-7" /><span>{text}</span>;
+        } else if (nav_logo.style === 'icon_only') {
+          const icon = nav_logo.variations.icon_only.icon;
+          return <img src={icon} alt="" class="size-6 lg:size-7" />;
+        } else if (nav_logo.style === 'text_only') {
+          const text = nav_logo.variations.text_only.text;
+          return <span>{text}</span>;
+        } else if (nav_logo.style === 'full_logo') {
+          const full_logo = nav_logo.variations.full_logo;
+          return <img src={full_logo.logo} style="aspect-ratio: ${full_logo.width} / ${full_logo.height}" alt="" class="h-6 lg:h-7" />;
+        }}}
+			</a>
+		</div>
+		<div class="flex gap-2 place-items-center sm:gap-6">
+      <select
+        id="version-select"
+        class="text-md font-medium text-zinc-500 dark:text-zinc-400 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-md px-3 py-1.5"
+        onchange="window.location.href = this.value"
+      >
+        {versions.map((v) => v.name === version ? (
+          <option value={`/${v.name}/${v.homepage}`} selected>{v.name}</option>
+        ): (
+          <option value={`/${v.name}/${v.homepage}`}>{v.name}</option>
+        ))}
+      </select>
+			<!-- theme toggler -->
+			<div class="scale-75 darkmode-toggle md:scale-90">
+				<button aria-label="Toggle Color Theme" id="theme-toggler"></button>
+			</div>
+		</div>
+	</div>
+</nav>
+<!-- Navigation ends -->
+
+<style is:global>
+  /* Toggle */
+  .darkmode-toggle {
+    background: linear-gradient(135deg, rgba(93, 199, 225, 0.7) 30%, rgba(255, 222, 30, 0.7));
+    display: inline-block;
+    border-radius: 50rem;
+    width: 3rem;
+    height: 1.75rem;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .dark .darkmode-toggle {
+    background: linear-gradient(225deg, rgba(58, 182, 213, 0.3) 30%, rgba(116, 58, 213, 0.4));
+  }
+
+  .darkmode-toggle button {
+    background-color: #ffffff;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    position: absolute;
+    padding: 0;
+    border: none;
+    top: 0.125rem;
+    left: 0.125rem;
+    transition: all 0.3s ease;
+  }
+  .dark .darkmode-toggle button {
+    left: 1.35rem;
+  }
+
+  /* Navbar */
+
+  #nav-sidebar-toggle {
+    @apply mr-2 size-10 lg:hidden;
+  }
+  #nav-sidebar-toggle .ic-hamburger {
+    background: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg width="24px" height="24px" stroke-width="1.6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="%23000000"><path d="M3 5H21" stroke="%23000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 12H21" stroke="%23000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 19H21" stroke="%23000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>');
+    @apply size-6 scale-90 dark:invert-[0.9];
+  }
+</style>
+
+
+<script>
+  const theme_toggler = document.getElementById('theme-toggler');
+  function toggleTheme() {
+    document.querySelector("html")?.classList.toggle("dark");
+    localStorage.setItem(
+      "theme",
+      document.querySelector("html")?.classList.contains("dark") ? "dark" : "light",
+    );
+  }
+  theme_toggler?.addEventListener("click", toggleTheme);
+</script>

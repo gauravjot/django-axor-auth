@@ -1,0 +1,49 @@
+---
+import '../global.css';
+import { loadLinks, loadScripts } from '../utils/load_config';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+    {loadLinks().map((link) => {
+      return <Fragment set:html={link} />;
+    })}
+	</head>
+	<body>
+		<slot />
+    <script src="/js/clipboard.min.js" type="text/javascript" is:inline></script>
+    <script src="/js/main.js" type="text/javascript" is:inline></script>
+    <script src="/js/dynamic_hydration.js" type="text/javascript" is:inline></script>
+    <script src="/js/anchor_click_spacer.js" type="text/javascript" is:inline></script>
+    {loadScripts().map((scripts) => {
+      return <Fragment set:html={scripts} />;
+    })}
+	</body>
+</html>
+
+<script>
+  // IMPORTANT: keep this here
+  // Light and dark theme
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches &&
+    localStorage.getItem("theme") !== "light"
+  ) {
+    document.querySelector("html")?.classList.add("dark");
+  } else {
+    document.querySelector("html")?.classList.remove("dark");
+  }
+</script>
