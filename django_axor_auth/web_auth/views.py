@@ -6,7 +6,7 @@ from django.utils.encoding import force_str
 from django_axor_auth.configurator import config
 from django_axor_auth.users.users_forgot_password.views import forgot_password, reset_password, _check_health
 from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
-from django_axor_auth.users.views import login, me, logout
+from django_axor_auth.users.views import login, me, logout, verify_email
 from .forms import SignInForm, ProcessMagicLinkForm, ForgotPasswordForm, ProcessForgotPasswordForm
 
 app_info = dict(
@@ -163,4 +163,21 @@ def process_magic_link(request):
 
 
 def process_verify_email(request):
-    return render(request, 'sign_in.html')
+    template = 'process_verify_email.html'
+    # Set the request source
+    request.requested_by = 'web'
+    token = request.GET.get('token')
+    # Check if user is already signed in
+    if token:
+        if request.method == "POST":
+            api_res = verify_email(request)
+            if api_res.status_code >= 400:
+                error = json.loads(api_res.content).get('title')
+                # Give user the error message
+                return render(request, template, {'app': app_info, 'error': error})
+            else:
+                # Verified
+                return render(request, template, {'app': app_info, 'success': True})
+        return render(request, template, {'app': app_info, 'token': token})
+    else:
+        return render(request, template, {'app': app_info, 'error': 'Token is required.'})

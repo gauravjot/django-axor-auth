@@ -399,6 +399,8 @@ def verify_email(request):
         row.user.is_email_verified = True
         row.user.save()
         return Response(status=204)
+    elif row.user.is_email_verified:
+        return Response(status=204)
     return ErrorMessage(
         title='Invalid token',
         detail='Token is invalid or expired.',

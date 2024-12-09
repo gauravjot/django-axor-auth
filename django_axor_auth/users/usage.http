@@ -54,6 +54,16 @@ Content-Type: application/json
   "code": 808592
 }
 
+### Verify email
+@verify_email_token = CxiNvxmOP0qbEO4Q5pEKLgJIByFGGCk_T1iu33aiHgZstcNjYmepU3yK
+POST http://{{host}}/api/user/verify_email/
+Content-Type: application/json
+
+{
+  "token": "{{verify_email_token}}"
+}
+
+
 ### Get user profile
 GET http://{{host}}/api/user/me/
 Authorization: {{auth_token}}
