@@ -1,8 +1,10 @@
 import uuid
+
+import bcrypt
 from django.db import models
 from django.utils.timezone import now
+
 from .managers import UserManager
-import bcrypt
 
 
 class User(models.Model):
@@ -50,4 +52,4 @@ class VerifyEmail(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f"id:{self.pk}, {self.user}, {self.created} (consumed: {self.consumed})"
+        return f"id:{self.pk}, {self.user}, {self.created_at} (consumed: {self.is_consumed})"

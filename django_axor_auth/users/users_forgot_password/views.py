@@ -1,17 +1,19 @@
 import urllib
 from datetime import timedelta
-from django.utils.timezone import now
+
 from django.utils.encoding import force_str
+from django.utils.timezone import now
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django_axor_auth.utils.error_handling.error_message import ErrorMessage
+
+from django_axor_auth.configurator import config
+from django_axor_auth.users.api import get_user
 from django_axor_auth.users.serializers import PasswordSerializer
 from django_axor_auth.users.users_utils.emailing.api import send_forgot_password_email, send_password_changed_email
-from django_axor_auth.configurator import config
+from django_axor_auth.utils.error_handling.error_message import ErrorMessage
 from .models import ForgotPassword
 from .serializers import HealthyForgotPasswordSerializer
 from .utils import getClientIP
-from django_axor_auth.users.api import get_user
 
 
 @api_view(['POST'])
@@ -31,7 +33,7 @@ def forgot_password(request):
     if not user:
         return Response(status=204)
     # if last request was made in lockout window, return
-    last_fp = ForgotPassword.filter(user=user).order_by('-created_at').first()
+    last_fp = ForgotPassword.objects.filter(user=user).order_by('-created_at').first()
     if last_fp and last_fp.created_at > now() - timedelta(seconds=config.FORGET_PASSWORD_LOCKOUT_TIME):
         return Response(status=204)
     # Create forgot password instance
@@ -67,6 +69,13 @@ def check_health(request):
     return Response(status=204)
 
 
+def _check_health(token):
+    serializer = HealthyForgotPasswordSerializer(data={'token': token})
+    if not serializer.is_valid():
+        return False
+    return True
+
+
 @api_view(['POST'])
 def reset_password(request):
     # Check if password is provided
@@ -79,9 +88,9 @@ def reset_password(request):
             code="InsufficientData"
         )
         return err.to_response()
-    key = force_str(request.data['key'])
+    token = force_str(request.data['token'])
     # Check if key is valid
-    serializer = HealthyForgotPasswordSerializer(data={'key': key})
+    serializer = HealthyForgotPasswordSerializer(data={'token': token})
     if not serializer.is_valid():
         err = ErrorMessage(
             title='Invalid Request',

@@ -1,11 +1,12 @@
 from typing import Optional
-from .models import User, VerifyEmail
+
 from django_axor_auth.middlewares import is_web
-# Session Imports
-from .users_sessions.utils import get_active_session
+from .models import User, VerifyEmail
+from .serializers import UserSerializer
 # App Token Imports
 from .users_app_tokens.utils import get_active_token
-from .serializers import UserSerializer
+# Session Imports
+from .users_sessions.utils import get_active_session
 
 
 def get_user(email) -> Optional[User]:
@@ -205,6 +206,22 @@ def latest_unused_email_verification(user) -> VerifyEmail | None:
     """
     try:
         return VerifyEmail.objects.filter(user=user, is_consumed=False).latest('created_at')
+    except Exception as e:
+        return None
+
+
+def get_email_verification(token) -> VerifyEmail | None:
+    """
+    Get email verification
+
+    Args:
+        user (User): User object
+        token (str): Verification token
+
+    Returns: VerifyEmail
+    """
+    try:
+        return VerifyEmail.objects.select_related('user').get(token=token)
     except Exception as e:
         return None
 

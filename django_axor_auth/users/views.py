@@ -1,31 +1,38 @@
 import urllib.parse
 from datetime import timedelta
 from secrets import token_urlsafe
-from django.utils.encoding import force_str
-from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from django.utils.timezone import now
-from django_axor_auth.utils.error_handling.error_message import ErrorMessage
-from django_axor_auth.middlewares import is_web
-from django_axor_auth.configurator import config
-from django_axor_auth.security.hashing import hash_this
+
 # JWT
 import jwt
-# Session Imports
-from .users_sessions.api import create_session, delete_session, get_last_session_details, delete_all_sessions, delete_all_sessions_except
-from .users_sessions.utils import get_active_session
+from django.conf import settings
+from django.utils.encoding import force_str
+from django.utils.timezone import now
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+from django_axor_auth.configurator import config
+from django_axor_auth.middlewares import is_web
+from django_axor_auth.security.hashing import hash_this
+from django_axor_auth.utils.error_handling.error_message import ErrorMessage
+from .api import consume_active_email_verifications, email_exists, get_request_user, latest_unused_email_verification, \
+    get_email_verification
+from .permissions import IsAuthenticated
+# User Imports
+from .serializers import EmailSerializer, PasswordSerializer, UserSerializer, LoginSerializer, RegistrationSerializer, \
+    VerifyEmailSerializer
 # App Token Imports
-from .users_app_tokens.api import create_app_token, get_last_token_session_details, delete_app_token, delete_all_app_tokens, delete_all_app_tokens_except
+from .users_app_tokens.api import create_app_token, get_last_token_session_details, delete_app_token, \
+    delete_all_app_tokens, delete_all_app_tokens_except
 from .users_app_tokens.utils import get_active_token
+# Session Imports
+from .users_sessions.api import create_session, delete_session, get_last_session_details, delete_all_sessions, \
+    delete_all_sessions_except
+from .users_sessions.utils import get_active_session
 # TOTP Imports
 from .users_totp.api import has_totp, authenticate_totp
-# User Imports
-from .serializers import EmailSerializer, PasswordSerializer, UserSerializer, LoginSerializer, RegistrationSerializer, VerifyEmailSerializer
-from .permissions import IsAuthenticated
-from .api import consume_active_email_verifications, email_exists, get_request_user, latest_unused_email_verification
 # Email
-from .users_utils.emailing.api import send_email_changed_email, send_password_changed_email, send_welcome_email, send_verification_email as send_general_verification_email
+from .users_utils.emailing.api import send_email_changed_email, send_password_changed_email, send_welcome_email, \
+    send_verification_email as send_general_verification_email
 
 
 @api_view(['POST'])
@@ -102,7 +109,8 @@ def _finish_login(request, user):
     totp_row = has_totp(user)
     if totp_row is not None:
         # If totp code is not provided
-        if 'code' not in request.data or ('code' in request.data and (request.data['code'] == None or request.data['code'] == '')):
+        if 'code' not in request.data or (
+                'code' in request.data and (request.data['code'] is None or request.data['code'] == '')):
             return ErrorMessage(
                 detail="TOTP code is required.",
                 status=401,
@@ -176,7 +184,7 @@ def _finish_login(request, user):
 # --------------------------------------------------------------------
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def deleteUser(request):
+def delete_user(request):
     pass
 
 
@@ -228,7 +236,7 @@ def me(request):
 # --------------------------------------------------------------------
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def changePassword(request):
+def change_password(request):
     user = get_request_user(request)
     # Check if old password and new password are provided
     if 'old_password' not in request.data or 'new_password' not in request.data:
@@ -254,7 +262,7 @@ def changePassword(request):
             ).to_response()
         # Update password
         user.set_password(new_password)
-        # Disabe all existing sessions except current
+        # Disable all existing sessions except current
         if is_web(request):
             delete_all_sessions_except(user, get_active_session(request).id)
             delete_all_app_tokens(user)
@@ -278,7 +286,7 @@ def changePassword(request):
 # --------------------------------------------------------------------
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def changeName(request):
+def change_name(request):
     user = get_request_user(request)
     # Check if first name and last name are provided
     if 'first_name' not in request.data or 'last_name' not in request.data:
@@ -301,7 +309,7 @@ def changeName(request):
 # --------------------------------------------------------------------
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def changeEmail(request):
+def change_email(request):
     user = get_request_user(request)
     # Check if email and password are provided
     if 'email' not in request.data or 'password' not in request.data:
@@ -373,15 +381,38 @@ def changeEmail(request):
 # Verify email
 # --------------------------------------------------------------------
 @api_view(['POST'])
-def verifyEmail(request):
-    pass
+def verify_email(request):
+    if 'token' not in request.data:
+        return ErrorMessage(
+            detail='Token is required.',
+            status=400,
+            instance=request.build_absolute_uri(),
+            title='Insufficient data',
+            code='TokenRequired'
+        ).to_response()
+    token = force_str(request.data['token'])
+    row = get_email_verification(hash_this(token))
+    if row and not row.is_consumed and row.created_at > now() - timedelta(
+            seconds=config.EMAIL_VERIFICATION_LINK_TIMEOUT):
+        row.is_consumed = True
+        row.save()
+        row.user.is_email_verified = True
+        row.user.save()
+        return Response(status=204)
+    return ErrorMessage(
+        title='Invalid token',
+        detail='Token is invalid or expired.',
+        status=400,
+        instance=request.build_absolute_uri(),
+        code='InvalidToken'
+    ).to_response()
 
 
 # Resend Verification Email if user is unverified
 # --------------------------------------------------------------------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def resendVerificationEmail(request):
+def resend_verification_email(request):
     user = get_request_user(request)
     if user.is_email_verified:
         return ErrorMessage(
@@ -392,14 +423,15 @@ def resendVerificationEmail(request):
             code='EmailVerified'
         ).to_response()
 
-    # Check if last email was sent atleast xx seconds ago (config.EMAIL_VERIFICATION_LINK_TIMEOUT)
+    # Check if last email was sent at least xx seconds ago (config.EMAIL_VERIFICATION_LINK_TIMEOUT)
     latest_email_sent = latest_unused_email_verification(user)
-    if latest_email_sent and latest_email_sent.created_at + timedelta(seconds=config.EMAIL_VERIFICATION_LINK_TIMEOUT) > now():
+    if latest_email_sent and latest_email_sent.created_at + timedelta(
+            seconds=config.EMAIL_VERIFICATION_LINK_TIMEOUT) > now():
         time_to_wait = (latest_email_sent.created_at + timedelta(
             seconds=config.EMAIL_VERIFICATION_LINK_TIMEOUT) - now()).seconds // 60
         return ErrorMessage(
             detail=f'Email verification link was sent recently. Please wait {
-                time_to_wait} minutes before requesting another link.',
+            time_to_wait} minutes before requesting another link.',
             status=400,
             instance=request.build_absolute_uri(),
             title='Email verification link sent recently',
@@ -428,7 +460,7 @@ def resendVerificationEmail(request):
 # --------------------------------------------------------------------
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def activeSessions(request):
+def active_sessions(request):
     pass
 
 
@@ -436,7 +468,7 @@ def activeSessions(request):
 # --------------------------------------------------------------------
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def closeSession(request):
+def close_session(request):
     pass
 
 
@@ -444,19 +476,19 @@ def closeSession(request):
 
 def send_verification_email(user, is_new_account=False, is_email_changed=False) -> bool:
     # Generate and send email verification token
-    verifyToken = token_urlsafe(42)
-    verifySerializer = VerifyEmailSerializer(data=dict(
+    verify_token = token_urlsafe(42)
+    verify_serializer = VerifyEmailSerializer(data=dict(
         user=user.id,
-        token=hash_this(verifyToken),
+        token=hash_this(verify_token),
         created_at=now()
     ))
-    if verifySerializer.is_valid():
+    if verify_serializer.is_valid():
         # Delete previous verification tokens
         consume_active_email_verifications(user)
         # Save new
-        verifySerializer.save()
+        verify_serializer.save()
         # Send email
-        uri = config.EMAIL_VERIFICATION_LINK.replace("<token>", verifyToken)
+        uri = config.EMAIL_VERIFICATION_LINK.replace("<token>", verify_token)
         verification_url = urllib.parse.urljoin(config.FRONTEND_URL, uri)
         if is_new_account:
             send_welcome_email(user.first_name, verification_url, user.email)

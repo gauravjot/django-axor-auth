@@ -4,9 +4,10 @@ from django.shortcuts import render
 from django.utils.encoding import force_str
 
 from django_axor_auth.configurator import config
+from django_axor_auth.users.users_forgot_password.views import forgot_password, reset_password, _check_health
 from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
 from django_axor_auth.users.views import login, me, logout
-from .forms import SignInForm, ProcessMagicLinkForm
+from .forms import SignInForm, ProcessMagicLinkForm, ForgotPasswordForm, ProcessForgotPasswordForm
 
 app_info = dict(
     app_name=config.APP_NAME,
@@ -81,12 +82,48 @@ def sign_out_page(request):
     return render(request, template, {'app': app_info, 'referrer': referrer})
 
 
-def forgot_password(request):
-    return render(request, 'sign_in.html')
+def forgot_password_page(request):
+    template = 'forgot_password.html'
+    if request.method == "POST":
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            request.requested_by = 'web'
+            # Send email to user
+            forgot_password(request)
+            return render(request, template, {'app': app_info, 'success': True})
+    return render(request, template, {'app': app_info, 'form': ForgotPasswordForm()})
 
 
 def process_forgot_password(request):
-    return render(request, 'sign_in.html')
+    template = 'process_forgot_password.html'
+    token = request.GET.get('token')
+    # Process the password reset
+    if request.method == "POST":
+        form = ProcessForgotPasswordForm(request.POST)
+        if form.is_valid():
+            request.requested_by = 'web'
+            request.data = form.cleaned_data
+            api_res = reset_password(request)
+            if api_res.status_code >= 400:
+                try:
+                    error = json.loads(api_res.content).get('detail').get('non_field_errors')[0]
+                except:
+                    error = json.loads(api_res.content).get('title')
+                error_code = json.loads(api_res.content).get('code')
+                if error_code == "HealthCheckFailed":
+                    return render(request, template, {'app': app_info, 'fatal_error': error})
+                return render(request, template, {'app': app_info, 'error': error, 'parse': True, 'form': form})
+            else:
+                return render(request, template, {'app': app_info, 'success': True})
+        return render(request, template,
+                      {'app': app_info, 'error': 'Please enter passwords correctly.', 'parse': True, 'form': form})
+    # Check if the token is valid
+    if not token or not _check_health(token):
+        return render(request, template, {'app': app_info,
+                                          'fatal_error': 'Token is not present or invalid. Please try requesting a new link.'})
+    # Return the form
+    form = ProcessForgotPasswordForm(initial={'token': token})
+    return render(request, template, {'app': app_info, 'form': form, 'parse': True})
 
 
 # Magic Link or Passwordless Login

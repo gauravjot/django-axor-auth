@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from decouple import config
 from django.core.mail import get_connection
 
@@ -19,8 +20,8 @@ ALLOWED_HOSTS = ['*']
 # General
 APP_NAME = 'Django Boilerplate'
 # User app
-FORGET_PASSWORD_LINK_TIMEOUT = 30  # minutes
-FORGET_PASSWORD_LOCKOUT_TIME = 24  # hours (To prevent bad actors)
+FORGET_PASSWORD_LINK_TIMEOUT = 30 * 60  # seconds
+FORGET_PASSWORD_LOCKOUT_TIME = 24 * 60 * 60  # seconds
 TOTP_NUM_OF_BACKUP_CODES = 8
 TOTP_BACKUP_CODE_LENGTH = 8  # keep it more than 6 to differentiate from TOTP code
 
@@ -45,7 +46,6 @@ AXOR_AUTH = dict(
     SMTP_DEFAULT_SEND_FROM=config('SMTP_DEFAULT_SEND_FROM', default=None),
     FRONTEND_URL=config('FRONTEND_URL', default=None),
 )
-
 
 # Email
 # https://docs.djangoproject.com/en/5.0/topics/email/

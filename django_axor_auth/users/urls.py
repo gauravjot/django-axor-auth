@@ -1,6 +1,6 @@
 from django.urls import path, include
-from . import views
 
+from . import views
 
 """
 api/user/
@@ -10,23 +10,23 @@ urlpatterns = [
     path('register/', views.register),
     path('login/', views.login),
     path('logout/', views.logout),
-    path('delete/', views.deleteUser),
+    path('delete/', views.delete_user),
 
     # Get user info
     path('me/', views.me),
 
     # Verify user
-    path('verify_email/resend/', views.resendVerificationEmail),
-    path('verify_email/<emailtoken>/', views.verifyEmail),
+    path('verify_email/resend/', views.resend_verification_email),
+    path('verify_email/<emailtoken>/', views.verify_email),
 
     # Change stuff
-    path('change_password/', views.changePassword),
-    path('change_name/', views.changeName),
-    path('change_email/', views.changeEmail),
+    path('change_password/', views.change_password),
+    path('change_name/', views.change_name),
+    path('change_email/', views.change_email),
 
     # Session management
-    path('active_sessions/', views.activeSessions),
-    path('active_session/close/', views.closeSession),
+    path('active_sessions/', views.active_sessions),
+    path('active_session/close/', views.close_session),
 
     # Addon modules
     path('totp/', include('django_axor_auth.users.users_totp.urls')),
