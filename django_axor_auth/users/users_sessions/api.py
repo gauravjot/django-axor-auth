@@ -41,7 +41,7 @@ def delete_session(user, session_id):
 
     Returns: None
     """
-    Session.objects.delete_session(user, session_id)
+    return Session.objects.delete_session(user, session_id)
 
 
 def get_user(session_id):
@@ -51,7 +51,7 @@ def get_user(session_id):
     Args:
         session_id: int
     """
-    return Session.objects.get_user(session_id)
+    return Session.objects.get_user_by_email(session_id)
 
 
 def get_last_session_details(user):
@@ -82,25 +82,25 @@ def get_session_if_valid(user, session_id, serialized=False):
 
 
 def get_all_sessions(user, serialized=False):
-    sessions = Session.filter(user=user)
+    sessions = Session.objects.filter(user=user)
     if serialized:
         return SessionSerializer(sessions, many=True).data
     return sessions
 
 
 def get_all_active_sessions(user, serialized=False):
-    sessions = Session.filter(user=user, is_valid=True)
+    sessions = Session.objects.filter(user=user, is_valid=True)
     if serialized:
         return SessionSerializer(sessions, many=True).data
     return sessions
 
 
 def delete_all_sessions(user):
-    Session.filter(user=user, is_valid=True).update(is_valid=False)
+    Session.objects.filter(user=user, is_valid=True).update(is_valid=False)
     return None
 
 
 def delete_all_sessions_except(user, session_id):
-    Session.filter(user=user, is_valid=True).exclude(
+    Session.objects.filter(user=user, is_valid=True).exclude(
         pk=session_id).update(is_valid=False)
     return None

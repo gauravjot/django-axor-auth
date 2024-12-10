@@ -1,14 +1,16 @@
 import urllib.parse
+
 from django.utils.encoding import force_str
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django_axor_auth.utils.error_handling.error_message import ErrorMessage
-from django_axor_auth.users.api import get_user
-from .models import MagicLink
+
 from django_axor_auth.configurator import config
-from .utils import hash_this
+from django_axor_auth.users.api import get_user_by_email
 from django_axor_auth.users.users_utils.emailing.api import send_magic_link_email
 from django_axor_auth.users.views import magic_link_login
+from django_axor_auth.utils.error_handling.error_message import ErrorMessage
+from .models import MagicLink
+from .utils import hash_this
 
 
 @api_view(['POST'])
@@ -23,7 +25,7 @@ def request_magic_link(request):
         )
         return err.to_response()
     email = force_str(request.data['email']).strip()
-    user = get_user(email)
+    user = get_user_by_email(email)
     # if user is not found, return
     if not user:
         return Response(status=204)

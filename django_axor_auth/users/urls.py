@@ -26,7 +26,8 @@ urlpatterns = [
 
     # Session management
     path('active_sessions/', views.active_sessions),
-    path('active_session/close/', views.close_session),
+    path('active_sessions/close/', views.close_session),
+    path('active_sessions/close_except_current/', views.close_all_sessions_except_current),
 
     # Addon modules
     path('totp/', include('django_axor_auth.users.users_totp.urls')),

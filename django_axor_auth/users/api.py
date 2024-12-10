@@ -9,7 +9,7 @@ from .users_app_tokens.utils import get_active_token
 from .users_sessions.utils import get_active_session
 
 
-def get_user(email) -> Optional[User]:
+def get_user_by_email(email) -> Optional[User]:
     """
     Get active User object
 
@@ -40,9 +40,23 @@ def get_request_user(request) -> User | None:
         session = get_active_session(request)
         if session is not None:
             return session.user
-    # if session-based auth is not used the it has to be app token
+    # if session-based auth is not used then it has to be app token
     app_token = get_active_token(request)
     return app_token.user if app_token is not None else None
+
+
+def is_cookie_session(request) -> bool:
+    """
+    Check if cookie based session is being used
+    """
+    return is_web(request)
+
+
+def is_token_session(request) -> bool:
+    """
+    Check if token based session is being used
+    """
+    return not is_web(request)
 
 
 def add_user(email, password, first_name, last_name, created_by=None, serialized=False) -> User | Exception:
@@ -125,7 +139,7 @@ def change_email(user, new_email) -> User | Exception:
 
 def change_name(user, new_first_name, new_last_name) -> User | Exception:
     """
-    Change user name
+    Change user's first and last name
 
     Args:
         user (User): User object
@@ -215,7 +229,6 @@ def get_email_verification(token) -> VerifyEmail | None:
     Get email verification
 
     Args:
-        user (User): User object
         token (str): Verification token
 
     Returns: VerifyEmail

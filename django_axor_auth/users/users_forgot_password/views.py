@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from django_axor_auth.configurator import config
-from django_axor_auth.users.api import get_user
+from django_axor_auth.users.api import get_user_by_email
 from django_axor_auth.users.serializers import PasswordSerializer
 from django_axor_auth.users.users_utils.emailing.api import send_forgot_password_email, send_password_changed_email
 from django_axor_auth.utils.error_handling.error_message import ErrorMessage
@@ -28,7 +28,7 @@ def forgot_password(request):
         )
         return err.to_response()
     email = force_str(request.data['email']).strip()
-    user = get_user(email)
+    user = get_user_by_email(email)
     # if user is not found, return
     if not user:
         return Response(status=204)

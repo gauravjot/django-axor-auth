@@ -51,7 +51,7 @@ def get_user(app_token_id):
     Args:
         app_token_id: uuid
     """
-    return AppToken.objects.get_user(app_token_id)
+    return AppToken.objects.get_user_by_email(app_token_id)
 
 
 def get_last_token_session_details(user):
@@ -82,25 +82,25 @@ def get_app_token_if_valid(user, app_token_id, serialized=False):
 
 
 def get_all_app_tokens(user, serialized=False):
-    app_tokens = AppToken.filter(user=user)
+    app_tokens = AppToken.objects.filter(user=user)
     if serialized:
         return AppTokenSerializer(app_tokens, many=True).data
     return app_tokens
 
 
 def get_all_active_app_tokens(user, serialized=False):
-    app_tokens = AppToken.filter(user=user, is_valid=True)
+    app_tokens = AppToken.objects.filter(user=user, is_valid=True)
     if serialized:
         return AppTokenSerializer(app_tokens, many=True).data
     return app_tokens
 
 
 def delete_all_app_tokens(user):
-    AppToken.filter(user=user, is_valid=True).delete()
+    AppToken.objects.filter(user=user, is_valid=True).delete()
     return None
 
 
 def delete_all_app_tokens_except(user, app_token_id):
-    AppToken.filter(user=user, is_valid=True).exclude(
+    AppToken.objects.filter(user=user, is_valid=True).exclude(
         pk=app_token_id).update(is_valid=False)
     return None

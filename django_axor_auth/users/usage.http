@@ -4,7 +4,7 @@
 // Using anything else performs token based authentication.
 @x_requested_by = mobile
 
-@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJiVTlTUTBRek5uUXdNME14TVZwb2FUQnZObTFsVDIwMU5FOXZhM0JYWDNkclMxbzVVRFJoYmt4MFNtVkpNMGRJWDBoRVVVWlJXRVZOYldRd2NISlRlbkppZVhCVVZXcFpkM0pKVWxOSWNGTTFUR1YzYUdjIn0.NKqtRtLuC1NouoVjtmZN7ogOnBbeNTIe3ZRlD78toxk
+@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJkWFp4YjFsNlVXWm9VRVJqZVdacFlUSjBaVFpVVTBOSlYxcDZZWEpqYkVWYVFVOUlZVVp0Um1ScU5HTkpaamc1TVUxUk1VSklhMnhMVUhVMFduQlJUREk1ZGpORFFXbGhSMnh2UW5oQ1F6ZzVaMk10WDFFIn0.DZtwIr2Wuqu0aDQry9PK6HL4sD_-tafoGFNo8ZtK1YA
 
 ### Register a new user
 POST http://{{host}}/api/user/register/
@@ -34,7 +34,7 @@ X-Requested-By: {{x_requested_by}}
 {
   "email": "john@test.com",
   "password": "Pass1234!",
-  "code": 555923
+  "code": 906260
 }
 
 ### Request magic link
@@ -63,6 +63,20 @@ Content-Type: application/json
   "token": "{{verify_email_token}}"
 }
 
+### Get all active sessions
+GET http://{{host}}/api/user/active_sessions/
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+### Close session
+POST http://{{host}}/api/user/active_sessions/close/
+Content-Type: application/json
+Authorization: {{auth_token}}
+X-Requested-By: {{x_requested_by}}
+
+{
+  "id": "0b20f88d-c41b-4b69-b1dc-cfa2b4d81045"
+}
 
 ### Get user profile
 GET http://{{host}}/api/user/me/

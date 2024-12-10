@@ -1,8 +1,9 @@
 from django.db import models
-from django.utils.timezone import now
-from .utils import generate_token, hash_this, getClientIP, getUserAgent
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.timezone import now
+
 from django_axor_auth.configurator import config
+from .utils import generate_token, hash_this, getClientIP, getUserAgent
 
 
 class AppTokenManager(models.Manager):
@@ -45,9 +46,10 @@ class AppTokenManager(models.Manager):
                 app_token.is_valid = False
                 app_token.updated_at = now()
                 app_token.save()
+                return True
         except Exception as e:
-            return None
-        return None
+            return False
+        return False
 
     def authenticate_app_token(self, token, ua):
         """This function authenticates a user request

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
+
 from .utils import generateKey, getClientIP, getUserAgent, hash_this
-from django_axor_auth.users.api import get_user
 
 
 class ForgotPasswordManager(models.Manager):

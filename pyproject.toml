@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-axor-auth"
-version = "0.1.2"
+version = "0.1.3"
 description = "Django authentication API using Django Rest Framework."
 readme = "README.md"
-license = {file = "LICENSE"}
-authors = [{name = "Gauravjot Garaya"}]
+license = { file = "LICENSE" }
+authors = [{ name = "Gauravjot Garaya" }]
 keywords = ["django", "authentication", "rest", "api"]
 requires-python = ">=3.10"
 dependencies = [
-  "pyotp>=2.9.0", "pyjwt>=2.9.0", "bcrypt>=4.1.2", "Django>=5.0", "djangorestframework>=3.15.0", "psycopg2-binary>=2.9.9", "django-cors-headers>=4.3.1", "pycryptodome>=3.20.0", "pytz>=2024.1", "sqlparse>=0.4.4"
+    "pyotp>=2.9.0", "pyjwt>=2.9.0", "bcrypt>=4.1.2", "Django>=5.0", "djangorestframework>=3.15.0", "psycopg2-binary>=2.9.9", "django-cors-headers>=4.3.1", "pycryptodome>=3.20.0", "pytz>=2024.1", "sqlparse>=0.4.4"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

@@ -1,9 +1,11 @@
-from django.db import models
-from django.utils.timezone import now
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from datetime import timedelta
-from .utils import generate_session_key, hash_this, getClientIP, getUserAgent
+
+from django.db import models
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.timezone import now
+
 from django_axor_auth.configurator import config
+from .utils import generate_session_key, hash_this, getClientIP, getUserAgent
 
 
 class SessionManager(models.Manager):
@@ -57,9 +59,10 @@ class SessionManager(models.Manager):
                 session.is_valid = False
                 session.updated_at = now()
                 session.save()
+                return True
         except Exception as e:
-            return None
-        return None
+            return False
+        return False
 
     def authenticate_session(self, key, ip, ua):
         """This function authenticates a user request

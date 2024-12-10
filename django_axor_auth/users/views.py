@@ -22,11 +22,11 @@ from .serializers import EmailSerializer, PasswordSerializer, UserSerializer, Lo
     VerifyEmailSerializer
 # App Token Imports
 from .users_app_tokens.api import create_app_token, get_last_token_session_details, delete_app_token, \
-    delete_all_app_tokens, delete_all_app_tokens_except
+    delete_all_app_tokens, delete_all_app_tokens_except, get_all_active_app_tokens
 from .users_app_tokens.utils import get_active_token
 # Session Imports
 from .users_sessions.api import create_session, delete_session, get_last_session_details, delete_all_sessions, \
-    delete_all_sessions_except
+    delete_all_sessions_except, get_all_active_sessions
 from .users_sessions.utils import get_active_session
 # TOTP Imports
 from .users_totp.api import has_totp, authenticate_totp
@@ -87,7 +87,7 @@ def login(request):
         # Get user
         user = serializer.validated_data
         # Login user
-        return _finish_login(request, user)
+        return finish_login(request, user)
     errors = serializer.errors
     err_msg = ErrorMessage(
         detail=errors,
@@ -101,10 +101,10 @@ def login(request):
 
 def magic_link_login(request, user):
     # Login user
-    return _finish_login(request, user)
+    return finish_login(request, user)
 
 
-def _finish_login(request, user):
+def finish_login(request, user):
     # Check if user hash TOTP enabled
     totp_row = has_totp(user)
     if totp_row is not None:
@@ -463,15 +463,46 @@ def resend_verification_email(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def active_sessions(request):
-    pass
+    user = get_request_user(request)
+    sessions = get_all_active_sessions(user, True)
+    tokens = get_all_active_app_tokens(user, True)
+    return Response(data=dict(
+        sessions=sessions,
+        tokens=tokens
+    ), status=200)
 
 
 # Close a session
 # --------------------------------------------------------------------
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def close_session(request):
-    pass
+    user = get_request_user(request)
+    uid = force_str(request.data.get('id'))
+    if delete_session(user, uid):
+        return Response(status=204)
+    elif delete_app_token(user, uid):
+        return Response(status=204)
+    else:
+        return ErrorMessage(
+            detail='Session or token not found.',
+            status=400,
+            instance=request.build_absolute_uri(),
+            title='Session or token not found',
+            code='SessionTokenNotFound'
+        ).to_response()
+
+
+# Closed all sessions except current
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def close_all_sessions_except_current(request):
+    user = get_request_user(request)
+    if is_web(request):
+        delete_all_sessions_except(user, get_active_session(request).id)
+    else:
+        delete_all_app_tokens_except(user, get_active_token(request).id)
+    return Response(status=204)
 
 
 # --------------------------------------------------------------------
