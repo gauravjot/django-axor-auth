@@ -9,4 +9,5 @@ urlpatterns = [
     path('forgot-password/process/', views.process_forgot_password, name='process_forgot_password'),
     path('magic-link/process/', views.process_magic_link, name='process_magic_link'),
     path('verify-email/process/', views.process_verify_email, name='process_verify_email'),
+    path('enroll-totp/', views.totp_enroll_page, name='enroll_totp'),
 ]

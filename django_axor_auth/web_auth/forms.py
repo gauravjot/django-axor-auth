@@ -28,3 +28,7 @@ class ProcessForgotPasswordForm(forms.Form):
         if password != confirm_password:
             raise forms.ValidationError('Passwords do not match')
         return cleaned_data
+
+
+class TotpForm(forms.Form):
+    code = forms.CharField(label='2FA Code')

@@ -1,13 +1,16 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.encoding import force_str
 
 from django_axor_auth.configurator import config
+from django_axor_auth.users.api import get_request_user
 from django_axor_auth.users.users_forgot_password.views import forgot_password, reset_password, _check_health
 from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
+from django_axor_auth.users.users_totp.api import has_totp
+from django_axor_auth.users.users_totp.views import totp_init, totp_enable
 from django_axor_auth.users.views import login, me, logout, verify_email
-from .forms import SignInForm, ProcessMagicLinkForm, ForgotPasswordForm, ProcessForgotPasswordForm
+from .forms import SignInForm, ProcessMagicLinkForm, ForgotPasswordForm, ProcessForgotPasswordForm, TotpForm
 
 app_info = dict(
     app_name=config.APP_NAME,
@@ -181,3 +184,51 @@ def process_verify_email(request):
         return render(request, template, {'app': app_info, 'token': token})
     else:
         return render(request, template, {'app': app_info, 'error': 'Token is required.'})
+
+
+# TOTP Enroll Page
+# -----------------------------------------------------------------------------
+def totp_enroll_page(request):
+    template = 'enroll_totp.html'
+    redirect_url = request.GET.get('redirect')
+    # Set the request source
+    request.requested_by = 'web'
+    # Check if user is signed in
+    user = get_request_user(request)
+    # Check if user is signed in
+    if user is None:
+        # Redirect to sign in page
+        return redirect('login')
+    # Check if user has TOTP enabled
+    if has_totp(user):
+        return render(request, template,
+                      {'app': app_info, 'success': True, 'redirect': redirect_url, 'state': 'ENABLED'})
+    # Initialize TOTP
+    if request.method == "POST":
+        code = request.POST.get('code')
+        if not code:
+            api_res = totp_init(request)
+            if api_res.status_code >= 400:
+                error = json.loads(api_res.content).get('title')
+                return render(request, template, {'app': app_info, 'fatal_error': error, 'state': 'FAILED'})
+            else:
+                content = api_res.data
+                return render(request, template, {
+                    'app': app_info,
+                    'success': False,
+                    'redirect': redirect_url,
+                    'key': content.get('key'),
+                    'provision_key': content.get('provision'),
+                    'backup_codes': content.get('backup_codes'),
+                    'form': TotpForm(),
+                    'state': 'INITIALIZED'
+                })
+        else:
+            api_res = totp_enable(request)
+            if api_res.status_code >= 400:
+                error = json.loads(api_res.content).get('title')
+                return render(request, template, {'app': app_info, 'error': error, 'form': TotpForm()})
+            else:
+                return render(request, template,
+                              {'app': app_info, 'success': True, 'redirect': redirect_url, 'state': 'ENABLED'})
+    return render(request, template, {'app': app_info})

@@ -180,14 +180,6 @@ def finish_login(request, user):
         }, status=200)
 
 
-# Delete user
-# --------------------------------------------------------------------
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_user(request):
-    pass
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):

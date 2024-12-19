@@ -10,7 +10,6 @@ urlpatterns = [
     path('register/', views.register),
     path('login/', views.login),
     path('logout/', views.logout),
-    path('delete/', views.delete_user),
 
     # Get user info
     path('me/', views.me),

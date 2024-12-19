@@ -14,8 +14,9 @@
 #
 ##########################################################
 
-from .models import Totp
 from django.db.models import Q
+
+from .models import Totp
 
 
 def has_totp(user):
@@ -28,8 +29,7 @@ def has_totp(user):
     Returns: TOTP or None
     """
     try:
-        totp = Totp.objects.get(Q(user=user), ~Q(
-            status='disabled'), ~Q(status='initialized'))
+        totp = Totp.objects.get(Q(user=user), ~Q(status='disabled'), ~Q(status='initialized'))
         return totp
     except Totp.DoesNotExist:
         return None

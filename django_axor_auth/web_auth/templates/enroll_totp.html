@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Set up Two-Factor Authentication
+{% endblock title %}
+{% block content %}
+  <div class="flex justify-center h-screen w-100 place-items-center bg-gradient">
+    <div class="p-8 mx-4 space-y-3 shadow-lg bg-background rounded-4 w-100" style="max-width:30rem">
+      {% if app.app_logo %}
+        <div class="mb-5 text-center">
+          <img src="{{ app.app_logo }}" alt="{{ app.app_info }} Logo" style="height:3.25rem"/>
+        </div>
+      {% endif %}
+      {% if not success and state == "INITIALIZED" %}
+        <h1 class="text-3xl font-bold tracking-tight text-center text-black">Setup 2FA</h1>
+        <p class="mb-5 font-medium text-center text-gray-500 text-md leading-normal">
+          Start by scanning the QR code with your mobile device or copy your unique code.
+        </p>
+        <div class="flex my-6 justify-center">
+          <div id="qrcode" style="width:14rem; height:14rem;" class="flex"></div>
+        </div>
+        <div class="login-form space-y-3.5">
+          <div class="space-y-1">
+            <label for="key">Unique Key:</label>
+            <input id="key" type="text" value="{{ key }}" class="w-100" readonly>
+          </div>
+          <div class="space-y-1">
+            <label>Backup Codes:</label>
+            <div class="grid border rounded-2 border-gray-200 border-px p-2"
+                 style="grid-template-columns: repeat(4, 1fr)">
+              {% for code in backup_codes %}
+                <span class="inline-block my-1 uppercase font-medium" style="font-family: monospace">{{ code }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <form method="post" class="mt-6 mb-2 space-y-3 login-form">
+          {% csrf_token %}
+          <div class="space-y-1">
+            {{ form.code.label_tag }}
+            {{ form.code }}
+          </div>
+          <button type="submit" class="w-full mt-5 btn-primary">
+            Enable 2FA
+          </button>
+        </form>
+      {% elif success and state == "ENABLED" %}
+        <div class="flex justify-center gap-2 text-3xl font-bold tracking-tight text-center text-black place-items-center">
+          <div class="leading-none text-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                 stroke="green" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.801 10A10 10 0 1 1 17 3.335"/>
+              <path d="m9 11 3 3L22 4"/>
+            </svg>
+          </div>
+          <span>2FA is Enabled!</span>
+        </div>
+        <p class="mb-4 font-medium text-center text-gray-500 text-md leading-normal">
+          Your account is now more secure. {% if redirect %}Please wait while we redirect you.{% endif %}
+        </p>
+        {% if redirect %}
+          <div class="text-center truncate">
+            <a class="text-center text-sm" href="{{ redirect }}">{{ redirect }}</a>
+          </div>
+        {% endif %}
+      {% else %}
+        <h1 class="text-3xl font-bold tracking-tight text-center text-black">Setup 2FA</h1>
+        <p class="mb-4 font-medium text-center text-gray-500 text-md leading-normal">
+          2FA adds an extra layer of security to your account. Let's get started.
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="w-full mt-5 btn-primary">
+            Setup 2FA
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+  {% if success and redirect %}
+    <script type="text/javascript">
+        setTimeout(() => {
+            window.location.href = "{{ redirect }}";
+        }, 4000);
+    </script>
+  {% endif %}
+  <script type="text/javascript" src="{% static '/axor/js/qrcode.min.js' %}"></script>
+  <script type="text/javascript" defer>
+      var qrcode = new QRCode(document.getElementById("qrcode"), {
+          width: 300,
+          height: 300
+      });
+      qrcode.makeCode("{{ provision_key }}");
+  </script>
+{% endblock content %}

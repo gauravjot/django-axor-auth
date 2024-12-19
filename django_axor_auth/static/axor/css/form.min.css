@@ -36,7 +36,6 @@ input[type="password"]:read-only,
 input[type="text"]:read-only,
 textarea:read-only {
 	background-color: var(--color-gray-200);
-	pointer-events: none;
 }
 .btn,
 button {

@@ -4,7 +4,7 @@
 // Using anything else performs token based authentication.
 @x_requested_by = mobile
 
-@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJkWFp4YjFsNlVXWm9VRVJqZVdacFlUSjBaVFpVVTBOSlYxcDZZWEpqYkVWYVFVOUlZVVp0Um1ScU5HTkpaamc1TVUxUk1VSklhMnhMVUhVMFduQlJUREk1ZGpORFFXbGhSMnh2UW5oQ1F6ZzVaMk10WDFFIn0.DZtwIr2Wuqu0aDQry9PK6HL4sD_-tafoGFNo8ZtK1YA
+@auth_token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfdG9rZW4iOiJjemRtV2xaRGRYbE1RMGxOV0VweGNsaEllVTVFTWpneGExQkZhV2ROWkRCek1HdDRhMFoyY2pKemMxZHJiVEpWVjBFMU9UTTJkbTVTT1RGYVptNDVjRWRuWld4WmFGWkRXbEpWTFU0MVUwMVlhRVp1UjFFIn0.FrRmY8HnvopMWp4lCjUR-oKV68aKhMw_xT0nCh6_PoM
 
 ### Register a new user
 POST http://{{host}}/api/user/register/
@@ -34,7 +34,7 @@ X-Requested-By: {{x_requested_by}}
 {
   "email": "john@test.com",
   "password": "Pass1234!",
-  "code": 906260
+  "code": 476466
 }
 
 ### Request magic link
@@ -113,7 +113,7 @@ Authorization: {{auth_token}}
 X-Requested-By: {{x_requested_by}}
 
 {
-  "code": 571560
+  "code": 155982
 }
 
 ### Reset backup codes
