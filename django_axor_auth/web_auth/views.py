@@ -1,6 +1,7 @@
 import json
 
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.encoding import force_str
 
 from django_axor_auth.configurator import config
@@ -9,8 +10,9 @@ from django_axor_auth.users.users_forgot_password.views import forgot_password, 
 from django_axor_auth.users.users_magic_link.views import consume_magic_link, request_magic_link
 from django_axor_auth.users.users_totp.api import has_totp
 from django_axor_auth.users.users_totp.views import totp_init, totp_enable
-from django_axor_auth.users.views import login, me, logout, verify_email
-from .forms import SignInForm, ProcessMagicLinkForm, ForgotPasswordForm, ProcessForgotPasswordForm, TotpForm
+from django_axor_auth.users.views import login, me, logout, verify_email, register
+from .forms import SignInForm, ProcessMagicLinkForm, ForgotPasswordForm, ProcessForgotPasswordForm, TotpForm, \
+    RegisterForm
 
 app_info = dict(
     app_name=config.APP_NAME,
@@ -18,10 +20,43 @@ app_info = dict(
 )
 
 
+# Register Page
+# -----------------------------------------------------------------------------
+def register_page(request):
+    template = 'register.html'
+    redirect_url = request.GET.get('redirect')
+    form = RegisterForm()
+    # Set the request source
+    request.requested_by = 'web'
+    # Check if user is already signed in
+    user = get_request_user(request)
+    if user is not None:
+        return redirect(redirect_url or 'login')
+    # Check if registration is enabled
+    if not config.IS_REGISTRATION_ENABLED:
+        return redirect(redirect_url or 'login')
+    # Check if there is a sign in request
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            api_res = register(request)
+            if api_res.status_code >= 400:
+                error = json.loads(api_res.content).get('detail').get('non_field_errors')[0]
+                return render(request, template,
+                              {'app': app_info, 'form': form, 'error': error, 'redirect': redirect_url})
+            # Registration successful
+            response = render(request, template, {'app': app_info, 'success': True, 'redirect': redirect_url})
+            response.cookies = api_res.cookies
+            return response
+        pass
+    return render(request, template, {'app': app_info, 'form': form, 'redirect': redirect_url})
+
+
 # Sign In Page
 # -----------------------------------------------------------------------------
 def sign_in_page(request):
     template = 'sign_in.html'
+    redirect_url = request.GET.get('redirect')
     # Set the request source
     request.requested_by = 'web'
     # Check if there is a sign in request
@@ -37,13 +72,18 @@ def sign_in_page(request):
                 error_code = json.loads(api_res.content).get('code')
                 # Check if the error is due to TOTP requirement
                 if api_res.status_code == 401 and 'TOTP' in error_code:
-                    return render(request, template, {'app': app_info, 'totp': True, 'form': form})
+                    return render(request, template, {'app': app_info, 'totp': True, 'form': form,
+                                                      'registration_enabled': config.IS_REGISTRATION_ENABLED,
+                                                      'redirect': redirect_url})
                 # Give user the error message
-                return render(request, template, {'app': app_info, 'error': error, 'form': form})
+                return render(request, template, {'app': app_info, 'error': error, 'form': form,
+                                                  'registration_enabled': config.IS_REGISTRATION_ENABLED,
+                                                  'redirect': redirect_url})
             else:
                 # User is signed in
                 response = render(request, template,
-                                  {'app': app_info, 'success': True, 'redirect': request.GET.get('redirect')})
+                                  {'app': app_info, 'success': True, 'redirect': redirect_url,
+                                   'registration_enabled': config.IS_REGISTRATION_ENABLED})
                 response.cookies = api_res.cookies
                 return response
         elif is_passwordless:
@@ -51,23 +91,31 @@ def sign_in_page(request):
             email = force_str(form.data.get('email'))
             request.data = {'email': email}
             request_magic_link(request)
-            return render(request, template, {'app': app_info, 'success': True, 'passwordless': True})
+            return render(request, template,
+                          {'app': app_info, 'success': True, 'passwordless': True, 'redirect': redirect_url})
         return render(request, template, {'app': app_info, 'error': 'Please enter email and password.', 'form': form,
-                                          'passwordless': is_passwordless})
+                                          'passwordless': is_passwordless,
+                                          'registration_enabled': config.IS_REGISTRATION_ENABLED,
+                                          'redirect': redirect_url})
     else:
         # Check if user is already signed in
         user = me(request)
         if user.status_code < 400:
             return render(request, template,
-                          {'app': app_info, 'success': True, 'redirect': request.GET.get('redirect')})
+                          {'app': app_info, 'success': True, 'redirect': redirect_url,
+                           'registration_enabled': config.IS_REGISTRATION_ENABLED})
         else:
             # User is not signed in
             form = SignInForm()
             # Check if ?method=passwordless is in the URL
             if request.GET.get('method') == 'passwordless':
-                return render(request, template, {'app': app_info, 'passwordless': True, 'form': form})
+                return render(request, template, {'app': app_info, 'passwordless': True, 'form': form,
+                                                  'registration_enabled': config.IS_REGISTRATION_ENABLED,
+                                                  'redirect': redirect_url})
             # default
-            return render(request, template, {'app': app_info, 'form': form})
+            return render(request, template,
+                          {'app': app_info, 'form': form, 'registration_enabled': config.IS_REGISTRATION_ENABLED,
+                           'redirect': redirect_url})
 
 
 # Logout
@@ -76,6 +124,8 @@ def sign_out_page(request):
     template = 'sign_out.html'
     redirect_url = request.GET.get('redirect')
     referrer = request.GET.get('referrer')
+    if redirect_url is None:
+        redirect_url = reverse('login')
     if referrer is None or len(referrer) < 1:
         referrer = request.META.get('HTTP_REFERER')
     if request.method == "POST":

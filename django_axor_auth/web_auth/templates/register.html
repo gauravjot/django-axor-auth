@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+  Register
+{% endblock title %}
+{% block content %}
+  <div class="flex justify-center min-h-screen w-100 place-items-center bg-gradient">
+    <div class="p-8 mx-4 space-y-3 shadow-lg bg-background rounded-4 w-100" style="max-width:30rem">
+      {% if app.app_logo %}
+        <div class="mb-5 text-center">
+          <img src="{{ app.app_logo }}" alt="{{ app.app_name }} Logo" style="height:3.25rem"/>
+        </div>
+      {% endif %}
+      {% if success is None or success is False %}
+        <h1 class="text-3xl font-bold tracking-tight text-center text-black">Create an Account</h1>
+        <p class="mb-5 font-medium text-center text-gray-500 text-md">
+          Sign up to get started with {{ app.app_name }}. It's only takes a minute.
+        </p>
+        {% if error and error is not NONE %}
+          <div class="bg-danger bg-opacity-10 p-3.5 rounded-2 text-danger">
+            <h2 class="mb-1 font-semibold">Something went wrong..</h2>
+            <p class="text-md">{{ error }}</p>
+          </div>
+        {% endif %}
+        <div id="form-error"></div>
+        <form method="post" id="m-form" class="my-8 space-y-3.5 login-form">
+          {% csrf_token %}
+          <div class="space-y-1">
+            {{ form.first_name.label_tag }}
+            {{ form.first_name }}
+          </div>
+          <div class="space-y-1">
+            {{ form.last_name.label_tag }}
+            {{ form.last_name }}
+          </div>
+          <div class="space-y-1">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+          </div>
+          <div class="space-y-1">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <p class="text-gray-400"><small>Must contain one uppercase, lowercase, number, and symbol.</small></p>
+          </div>
+          <div class="space-y-1">
+            {{ form.confirm_password.label_tag }}
+            {{ form.confirm_password }}
+          </div>
+          <button type="button" id="submit-btn" class="w-full mt-5 btn-primary">
+            Register
+          </button>
+        </form>
+        <p>
+          Already have an account? <a href="{% url 'login' %}?redirect={{ redirect }}" class="text-primary">Sign In</a>
+        </p>
+        <div class="mt-6 text-xs text-center text-gray-500">
+          {% if app.app_name %}{{ app.app_name }}.{% endif %}
+          Secure session established.
+        </div>
+      {% else %}
+        {% if success %}
+          <h1 class="text-3xl font-bold tracking-tight text-center text-black">Welcome Aboard!</h1>
+          {% if redirect %}
+            <p class="font-medium leading-normal text-center text-gray-500 text-md">
+              Please wait while we redirect you to your destination.
+            </p>
+            <div class="text-center truncate">
+              <a class="text-center text-sm" href="{{ redirect }}">{{ redirect }}</a>
+            </div>
+          {% else %}
+            <p class="font-medium leading-normal text-center text-gray-500 text-md">You can close this window now.</p>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+  {% if success and redirect %}
+    <script>
+        setTimeout(() => {
+            window.location.href = "{{ redirect }}";
+        }, 2000);
+    </script>
+  {% endif %}
+  <script>
+      // Validation
+      const password_field = document.querySelector('input[name="password"]');
+      const confirm_password_field = document.querySelector('input[name="confirm_password"]');
+      confirm_password_field.addEventListener('input', () => {
+          if (confirm_password_field.value !== password_field.value) {
+              confirm_password_field.classList.add('input-error');
+          } else {
+              confirm_password_field.classList.remove('input-error');
+          }
+      });
+      password_field.addEventListener('input', () => {
+          if (confirm_password_field.value.length > 0 && confirm_password_field.value !== password_field.value) {
+              confirm_password_field.classList.add('input-error');
+          }
+      });
+
+      function validatePassword(value) {
+          const password_regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.<>/?;:'"\[{\]}`~\-_=+])(?=.*[a-zA-Z]).{8,}$/;
+          return value.match(password_regex);
+      }
+
+      // Check if password is at least 8 characters long, one uppercase letter, one lowercase letter, one number and one special character
+      password_field.addEventListener('input', () => {
+          const password = password_field.value;
+          if (!validatePassword(password)) {
+              password_field.classList.add('input-error');
+          } else {
+              password_field.classList.remove('input-error');
+          }
+      });
+      // Form submission
+      const form = document.getElementById('m-form');
+      const submit_button = document.querySelector('button[id="submit-btn"]');
+      const error_div = document.getElementById('form-error');
+      submit_button.addEventListener('click', () => {
+          const first_name = document.querySelector('input[name="first_name"]').value;
+          const last_name = document.querySelector('input[name="last_name"]').value;
+          const email = document.querySelector('input[name="email"]').value;
+          const password = document.querySelector('input[name="password"]').value;
+          const confirm_password = document.querySelector('input[name="confirm_password"]').value;
+          if (first_name.length === 0 || last_name.length === 0 || email.length === 0 || password.length === 0 || confirm_password.length === 0) {
+              error_div.innerHTML = '<div class="bg-danger bg-opacity-10 p-3.5 rounded-2 text-danger"><p class="text-md">All fields are required.</p></div>';
+              return;
+          }
+          if (password !== confirm_password) {
+              error_div.innerHTML = '<div class="bg-danger bg-opacity-10 p-3.5 rounded-2 text-danger"><p class="text-md">Passwords do not match.</p></div>';
+              return;
+          }
+          if (!validatePassword(password)) {
+              error_div.innerHTML = '<div class="bg-danger bg-opacity-10 p-3.5 rounded-2 text-danger"><p class="text-md">Password must be at least 8 characters long, contain one uppercase letter, one lowercase letter, one number and one special character.</p></div>';
+              return;
+          }
+          form.submit();
+      });
+  </script>
+{% endblock content %}

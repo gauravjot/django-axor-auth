@@ -1,9 +1,17 @@
 from django import forms
 
 
+class RegisterForm(forms.Form):
+    first_name = forms.CharField(label='First Name', required=True)
+    last_name = forms.CharField(label='Last Name', required=True)
+    email = forms.EmailField(label='Email', required=True)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=True)
+    confirm_password = forms.CharField(label='Confirm Password', widget=forms.PasswordInput, required=True)
+
+
 class SignInForm(forms.Form):
-    email = forms.EmailField(label='Email')
-    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+    email = forms.EmailField(label='Email', required=True)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=True)
     code = forms.CharField(label='2FA Code', required=False)
 
 
@@ -13,13 +21,13 @@ class ProcessMagicLinkForm(forms.Form):
 
 
 class ForgotPasswordForm(forms.Form):
-    email = forms.EmailField(label='Email')
+    email = forms.EmailField(label='Email', required=True)
 
 
 class ProcessForgotPasswordForm(forms.Form):
     token = forms.CharField(label='Token', required=True)
-    password = forms.CharField(label='Password', widget=forms.PasswordInput)
-    confirm_password = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=True)
+    confirm_password = forms.CharField(label='Confirm Password', widget=forms.PasswordInput, required=True)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -31,4 +39,4 @@ class ProcessForgotPasswordForm(forms.Form):
 
 
 class TotpForm(forms.Form):
-    code = forms.CharField(label='2FA Code')
+    code = forms.CharField(label='2FA Code', required=True)

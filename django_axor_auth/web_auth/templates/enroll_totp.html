@@ -4,11 +4,11 @@
   Set up Two-Factor Authentication
 {% endblock title %}
 {% block content %}
-  <div class="flex justify-center h-screen w-100 place-items-center bg-gradient">
+  <div class="flex justify-center min-h-screen w-100 place-items-center bg-gradient">
     <div class="p-8 mx-4 space-y-3 shadow-lg bg-background rounded-4 w-100" style="max-width:30rem">
       {% if app.app_logo %}
         <div class="mb-5 text-center">
-          <img src="{{ app.app_logo }}" alt="{{ app.app_info }} Logo" style="height:3.25rem"/>
+          <img src="{{ app.app_logo }}" alt="{{ app.app_name }} Logo" style="height:3.25rem"/>
         </div>
       {% endif %}
       {% if not success and state == "INITIALIZED" %}

@@ -8,6 +8,15 @@
   <link rel="stylesheet" href="{% static '/axor/css/form.min.css' %}"/>
   <link rel="stylesheet" href="{% static '/axor/css/base_template.min.css' %}"/>
   <link rel="stylesheet" href="{% static '/axor/css/main.css' %}"/>
+  <style>
+      @font-face {
+          font-family: Geist;
+          src: url("{% static '/axor/fonts/Geist.woff2' %}") format("woff2 supports variations"),
+          url("{% static '/axor/fonts/Geist.woff2' %}") format("woff2-variations");
+          font-weight: 100 900;
+          font-display: swap;
+      }
+  </style>
   <title>
     {% block title %}
     {% endblock title %}

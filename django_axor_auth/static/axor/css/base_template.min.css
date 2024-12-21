@@ -2,15 +2,6 @@
 .truncate {
 	white-space: nowrap;
 }
-@font-face {
-	font-family: Geist;
-	src: url("https://utfs.io/f/HU2dtejTilxKzCKmhMgwrhAiUsjaONtq79RKcgCfHoPx24mn")
-			format("woff2 supports variations"),
-		url("https://utfs.io/f/HU2dtejTilxKzCKmhMgwrhAiUsjaONtq79RKcgCfHoPx24mn")
-			format("woff2-variations");
-	font-weight: 100 900;
-	font-display: swap;
-}
 :root {
 	--font-sans: "Geist", ui-sans-serif, Helvetica, Arial, sans-serif;
 	--font-mono: monospace;
@@ -2713,6 +2704,12 @@ h6 {
 }
 .w-screen {
 	width: 100vw;
+}
+.min-h-screen {
+	min-height: 100vh;
+}
+.min-w-screen {
+	min-width: 100vw;
 }
 .h-100,
 .h-full {

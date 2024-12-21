@@ -37,6 +37,35 @@ input[type="text"]:read-only,
 textarea:read-only {
 	background-color: var(--color-gray-200);
 }
+input[type="email"].input-error,
+input[type="number"].input-error,
+input[type="password"].input-error,
+input[type="text"].input-error,
+textarea.input-error {
+	border-color: var(--color-danger-lighter);
+}
+input[type="email"].input-error:hover,
+input[type="number"].input-error:hover,
+input[type="password"]:.input-errorhover,
+input[type="text"].input-error:hover,
+textarea.input-error:hover {
+	border-color: var(--color-danger);
+}
+input[type="email"].input-error:focus,
+input[type="number"].input-error:focus,
+input[type="password"].input-error:focus,
+input[type="text"].input-error:focus,
+textarea.input-error:focus {
+	border-color: var(--color-danger-lighter);
+	outline: 0;
+}
+input[type="email"].input-error:read-only,
+input[type="number"].input-error:read-only,
+input[type="password"].input-error:read-only,
+input[type="text"].input-error:read-only,
+textarea.input-error:read-only {
+	background-color: var(--color-danger);
+}
 .btn,
 button {
 	--button-bg-color: var(--color-background);
