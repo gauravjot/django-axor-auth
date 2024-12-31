@@ -1,5 +1,6 @@
 ---
 title: Current Authenticated User
+sort: 6
 ---
 
 To get the current authenticated user, you can use the `get_current_user` method from the `django_axor_auth.users.utils` module.
@@ -7,6 +8,7 @@ To get the current authenticated user, you can use the `get_current_user` method
 ```python
 ...
 from django_axor_auth.users.api import get_request_user
+
 
 @api_view(['GET'])
 def some_endpoint(request):

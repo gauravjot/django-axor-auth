@@ -1,5 +1,6 @@
 ---
 title: Authentication Decorators
+sort: 8
 ---
 
 This page will guide you how you can protect your API endpoints using Django Axor, such that only authenticated users can access them.

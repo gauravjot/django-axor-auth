@@ -1,87 +1,114 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Topbar from '../../components/Topbar.astro';
-import { getCollection } from 'astro:content';
+import {getCollection} from 'astro:content';
 import Sidebar from '../../components/Sidebar.astro';
-import { SETTINGS } from '../../config/app';
-import { render } from '../../utils/md_render';
-import { versions } from '../../content/config';
+import {SETTINGS} from '../../config/app';
+import {render} from '../../utils/md_render';
+import {versions} from '../../content/config';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 export async function getStaticPaths() {
-  const paths: {}[] = [];
-  const _versions = [...versions];
-  _versions.unshift({name: "latest", homepage: _versions[0].homepage});
-  for (const version of _versions) {
-    let _name = version.name as string;
-    if (_name === "latest") _name = versions[0].name;
-    const docs = await getCollection(_name as any);
-    if (!docs || docs.length === 0) continue;
-    paths.push(...docs.map((doc: any) => ({params: {version: version.name, slug: doc.slug}, props: {version: version.name, doc: doc, docs: docs}})));
-  }
-  return paths;
+    const paths: {}[] = [];
+    const _versions = [...versions];
+    _versions.unshift({name: "latest", homepage: _versions[0].homepage});
+    for (const version of _versions) {
+        let _name = version.name as string;
+        if (_name === "latest") _name = versions[0].name;
+        const docs = await getCollection(_name as any);
+        if (!docs || docs.length === 0) continue;
+        paths.push(...docs.map((doc: any) => ({
+            params: {version: version.name, slug: doc.slug},
+            props: {version: version.name, doc: doc, docs: docs}
+        })));
+    }
+    return paths;
 }
 
-const {version, doc, docs}: {version: string, doc: any; docs: any} = Astro.props;
+const {version, doc, docs}: { version: string, doc: any; docs: any } = Astro.props;
 
 const index_doc = doc as any;
 
-const { html, toc } = index_doc ? render(index_doc.body) : {html: "", toc: ""};
+const {html, toc} = index_doc ? render(index_doc.body) : {html: "", toc: ""};
 
 const dyanamicHydration = SETTINGS.dynamic_hydration ? "dynamic" : "";
 ---
 
-<Layout title={index_doc.data.title + " | Planum Docs"}>
-  <Topbar version={version} />
+<Layout title={index_doc.data.title + " | Django Axor Auth"}>
+  <Topbar version={version}/>
   <div id="loading"></div>
-	<main class="container">
-    <Sidebar version={version} docs={docs} highlight={index_doc?.slug} />
-    <div class="sidebar-open mt-16 flex h-[calc(100%-4rem)] flex-col md:gap-6 xl:flex-row xl:gap-12 2xl:gap-16 3xl:gap-32 4xl:gap-48" id="content">
+  <main class="container">
+    <Sidebar version={version} docs={docs} highlight={index_doc?.slug}/>
+    <div class="sidebar-open mt-16 flex h-[calc(100%-4rem)] flex-col md:gap-6 xl:flex-row xl:gap-12 2xl:gap-16 3xl:gap-32 4xl:gap-48"
+         id="content">
       <div class="order-2 mb-8 flex-1 pt-px @container/doc" id="md-content">
-        <!-- Content starts --><div class="mt-8 text-zinc-500 dark:text-zinc-400">
-						{()=>{if (index_doc?.data.date) { return <>Updated — {index_doc?.data.date}</> }}}
-					</div>
-					<h1>{index_doc?.data.title}</h1>
-					<p>{index_doc?.data.description}</p>
-					<div set:html={html}></div>
-					<div id="doc-pn" class="mt-16 grid gap-5 @lg/doc:grid-cols-2 @lg/doc:gap-8">
-						<div class="col-span-1">
-							{() => { if(index_doc?.data.prev) {
-                return <a href={`/${version}/${docs?.find((s)=> s.slug === index_doc?.data.prev)?.slug}`} class="next-prev-btn" data-type={dyanamicHydration}>
-                  <div class="flex py-0.5 place-items-center text-zinc-700 dark:text-zinc-300">
-                    <div class="text-zinc-500 dark:text-zinc-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-                    </div>
-                    <div class="flex-1 font-medium">
-                      <div class="text-sm">Previous</div>
-                      <div class="mt-0.5 w-[calc(100%)] truncate font-medium">{docs?.find((s)=> s.slug === index_doc?.data.prev)?.data.title}</div></div>
-                  </div>
-                </a>
-							}}}
-						</div>
-						<div class="col-span-1">
-							{() => { if(index_doc?.data.next){
-							  return <a href={`/${version}/${docs?.find((s)=> s.slug === index_doc?.data.next)?.slug}`} class="next-prev-btn" data-type={dyanamicHydration}>
-                  <div class="flex py-0.5 place-items-center text-zinc-700 dark:text-zinc-300">
-                    <div class="flex-1 font-medium text-left">
-                      <div class="text-sm">Next</div>
-                      <div class="mt-0.5 w-[calc(100%)] truncate font-medium">{docs?.find((s)=> s.slug === index_doc?.data.next)?.data.title}</div>
-                    </div>
-                    <div class="text-zinc-500 dark:text-zinc-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </div>
-                  </div>
-                </a>
-							}}}
-						</div>
-					</div>
+        <!-- Content starts -->
+        <div class="mt-8 text-zinc-500 dark:text-zinc-400">
+            {() => {
+                if (index_doc?.data.date) {
+                    return
+                            <>Updated — {index_doc?.data.date}</>
+                }
+            }}
+        </div>
+        <h1>{index_doc?.data.title}</h1>
+        <p>{index_doc?.data.description}</p>
+        <div set:html={html}></div>
+        <div id="doc-pn" class="mt-16 grid gap-5 @lg/doc:grid-cols-2 @lg/doc:gap-8">
+          <div class="col-span-1">
+              {() => {
+                  if (index_doc?.data.prev) {
+                      return <a href={`/${version}/${docs?.find((s) => s.slug === index_doc?.data.prev)?.slug}`}
+                                class="next-prev-btn" data-type={dyanamicHydration}>
+                        <div class="flex py-0.5 place-items-center text-zinc-700 dark:text-zinc-300">
+                          <div class="text-zinc-500 dark:text-zinc-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="lucide lucide-arrow-left">
+                              <path d="m12 19-7-7 7-7"/>
+                              <path d="M19 12H5"/>
+                            </svg>
+                          </div>
+                          <div class="flex-1 font-medium">
+                            <div class="text-sm">Previous</div>
+                            <div class="mt-0.5 w-[calc(100%)] truncate font-medium">{docs?.find((s) => s.slug === index_doc?.data.prev)?.data.title}</div>
+                          </div>
+                        </div>
+                      </a>
+                  }
+              }}
+          </div>
+          <div class="col-span-1">
+              {() => {
+                  if (index_doc?.data.next) {
+                      return <a href={`/${version}/${docs?.find((s) => s.slug === index_doc?.data.next)?.slug}`}
+                                class="next-prev-btn" data-type={dyanamicHydration}>
+                        <div class="flex py-0.5 place-items-center text-zinc-700 dark:text-zinc-300">
+                          <div class="flex-1 font-medium text-left">
+                            <div class="text-sm">Next</div>
+                            <div class="mt-0.5 w-[calc(100%)] truncate font-medium">{docs?.find((s) => s.slug === index_doc?.data.next)?.data.title}</div>
+                          </div>
+                          <div class="text-zinc-500 dark:text-zinc-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="lucide lucide-arrow-right">
+                              <path d="M5 12h14"/>
+                              <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </a>
+                  }
+              }}
+          </div>
+        </div>
         <!-- Content ends -->
       </div>
       <!-- Table of Contents starts -->
-      <TableOfContents toc={toc} />
+      <TableOfContents toc={toc}/>
       <!-- Table of Contents ends -->
     </div>
-	</main>
+  </main>
 </Layout>
 
 <style>

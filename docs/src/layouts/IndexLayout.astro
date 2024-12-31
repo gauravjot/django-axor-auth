@@ -1,31 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Topbar from '../components/Topbar.astro';
-import { getCollection } from 'astro:content';
+import {getCollection} from 'astro:content';
 import Sidebar from '../components/Sidebar.astro';
-import { versions } from '../content/config';
+import {versions} from '../content/config';
 
 const docs = await getCollection(versions[0].name as any);
-
 ---
 
-<Layout title="Planum Docs | Simple Markdown Documentation">
-  <Topbar version={versions[0].name} />
+<Layout title="Django Axor Auth">
+  <Topbar version={versions[0].name}/>
   <div id="loading"></div>
-	<main class="container">
-    <Sidebar version={versions[0].name} docs={docs} highlight='' />
-    <div class="sidebar-open mt-16 flex h-[calc(100%-4rem)] flex-col md:gap-6 xl:flex-row xl:gap-12 2xl:gap-16 3xl:gap-32 4xl:gap-48" id="content">
+  <main class="container">
+    <Sidebar version={versions[0].name} docs={docs} highlight=''/>
+    <div class="sidebar-open mt-16 flex h-[calc(100%-4rem)] flex-col md:gap-6 xl:flex-row xl:gap-12 2xl:gap-16 3xl:gap-32 4xl:gap-48"
+         id="content">
       <div class="order-2 mb-8 flex-1 pt-px @container/doc" id="md-content">
         <div class="mt-8 text-zinc-500 dark:text-zinc-400">
           <!-- Content starts -->
 
-          <slot />
+          <slot/>
 
           <!-- Content ends -->
-				</div>
+        </div>
       </div>
     </div>
-	</main>
+  </main>
 </Layout>
 
 <style>

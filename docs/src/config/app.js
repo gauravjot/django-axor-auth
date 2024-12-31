@@ -15,7 +15,7 @@ export const META = {
     app_name: "Django Axor Auth Docs",
     app_description: "Documentation for Django Axor Auth",
     // app_url is where the app is hosted
-    app_url: "https://django-axor.vercel.app/",
+    app_url: "https://axor.nzran.com/",
     favicon: "/favicon.ico",
     navbar: {
         logo: {

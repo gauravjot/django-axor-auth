@@ -1,11 +1,12 @@
 ---
 title: Session vs App Token Authentication
+sort: 7
 ---
 
 Django Axor supports two types of authentication methods: session-based and app token-based. Here is a table that compares the two methods:
 
 | Feature           | Session-based                                                                  | App Token-based                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+|-------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | Use case          | Web applications                                                               | Mobile applications, IoT devices that cannot make use cookies                                           |
 | Security          | Cookies are only valid for certain time, and handled automatically by browser. | App token has to be saved by developer inside the app somewhere safe, preferrably in encrypted storage. |
 | Additional Header | _None_                                                                         | `Authorization: Bearer xxx` and `X-Requested-By: mobile_app`                                            |
